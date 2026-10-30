@@ -5,53 +5,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Коммуникатор</title>
 <style>
-  :root { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; --primary: #2563eb; --primary-light: #eff6ff; }
-  body.dark { --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; --primary: #3b82f6; --primary-light: #172554; }
+  /* ТЕМНАЯ ТЕМА И ЦВЕТА ПО УМОЛЧАНИЮ */
+  :root { 
+    --bg: transparent; 
+    --surface: rgba(30, 41, 59, 0.85); 
+    --text: #f8fafc; 
+    --text-light: #94a3b8; 
+    --border: rgba(255, 255, 255, 0.15); 
+    --primary: #3b82f6; 
+    --primary-light: rgba(59, 130, 246, 0.2); 
+  }
+  
+  /* СВЕТЛАЯ ТЕМА (по кнопке) */
+  body.light-mode { 
+    --bg: #f8fafc; 
+    --surface: #ffffff; 
+    --text: #0f172a; 
+    --text-light: #64748b; 
+    --border: #e2e8f0; 
+    --primary: #2563eb; 
+    --primary-light: #eff6ff; 
+  }
+
   * { box-sizing: border-box; margin: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
   
-  /* Прокрутка страницы */
-  body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; transition: background 0.3s; -webkit-overflow-scrolling: touch; }
-  
+  /* ПЛАВНЫЙ RGB ФОН */
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  body { 
+    background: linear-gradient(-45deg, #0f172a, #2e1065, #172554, #064e3b);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text); 
+    min-height: 100vh; 
+    display: flex; flex-direction: column; 
+    overflow-y: auto; overflow-x: hidden; 
+    transition: color 0.3s; 
+    -webkit-overflow-scrolling: touch; 
+  }
+  body.light-mode {
+    background: #f8fafc;
+    animation: none;
+  }
+
+  /* ЭФФЕКТ МАТОВОГО СТЕКЛА ДЛЯ ПАНЕЛЕЙ */
+  header, .strip, .card, .modal-box, .actions button, .suggest-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
   @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
   .anim-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
   #mainApp { display: flex; flex-direction: column; flex: 1; padding-bottom: 20px; }
   
-  /* Шапка */
   header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
   header h1 { font-size: 16px; font-weight: 800; }
   .header-actions { display: flex; gap: 4px; position: relative; }
-  .btn-icon { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
+  .btn-icon { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
+  body.light-mode .btn-icon { background: #f8fafc; }
   
-  /* Панель фразы */
   .strip-container { padding: 10px 14px 0; }
   .strip { min-height: 50px; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
   .strip::-webkit-scrollbar { display: none; }
   .chip { background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
   
-  /* Кнопки действий */
   .actions { display: flex; gap: 6px; padding: 10px 14px; }
-  .actions button { padding: 12px 2px; border: none; border-radius: 8px; font-weight: 700; font-size: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .btn-speak { background: #059669; } .btn-back { background: #d97706; } .btn-clear { background: #dc2626; }
+  .actions button { padding: 12px 2px; border: none; border-radius: 8px; font-weight: 700; font-size: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+  .btn-speak { background: rgba(5, 150, 105, 0.9); } 
+  .btn-back { background: rgba(217, 119, 6, 0.9); } 
+  .btn-clear { background: rgba(220, 38, 38, 0.9); }
 
-  /* Подсказки */
   .suggestions-container { padding: 0 14px 10px; }
   .suggest-title { font-size: 11px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; }
   .suggestions { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-height: 40px; align-items: center; }
   .suggestions::-webkit-scrollbar { display: none; }
-  .suggest-card { background: var(--primary-light); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+  .suggest-card { background: var(--surface); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
   .suggest-card span { font-weight: 600; font-size: 13px; color: var(--primary); }
 
-  /* Вкладки */
   .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
   .tab { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; }
-  .tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-  /* Сетка */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; padding: 0 14px 14px; align-content: start; }
   .grid.big { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; aspect-ratio: 1/1; border-bottom: 3px solid var(--border); transition: transform 0.1s; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; aspect-ratio: 1/1; border-bottom: 3px solid var(--border); transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
   .card:active { transform: scale(0.92); }
   .card .emoji { font-size: 32px; line-height: 1; margin-bottom: 6px; }
   .grid.big .card .emoji { font-size: 44px; }
@@ -64,23 +106,22 @@
   .c-places { border-bottom-color: #14b8a6; } .c-things { border-bottom-color: #64748b; }
   .c-game { border-bottom-color: #8b5cf6; } .c-questions { border-bottom-color: #ef4444; }
 
-  /* Модалки */
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal.active { opacity: 1; pointer-events: auto; }
-  .modal-box { background: var(--surface); padding: 20px; border-radius: 12px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.2s; max-height: 85vh; overflow-y: auto; }
+  .modal-box { background: var(--surface); padding: 20px; border-radius: 12px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.2s; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); }
   .modal.active .modal-box { transform: translateY(0); }
   .modal-box label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
-  select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; }
+  select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: var(--text); font-size: 14px; }
+  body.light-mode select { background: #f8fafc; }
 
-  /* Игры */
   .game-grid { display: grid; gap: 8px; margin-bottom: 15px; }
   .game-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
   .game-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
-  .game-card { aspect-ratio: 1/1; background: var(--bg); border: 2px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-  .game-card img { width: 80%; height: auto; opacity: 0; transition: opacity 0.2s; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .game-card { aspect-ratio: 1/1; background: rgba(0,0,0,0.3); border: 2px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+  .game-card img { width: 80%; height: auto; opacity: 0; transition: opacity 0.2s; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
   .quiz-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
-  .quiz-option { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; transition: transform 0.1s; }
+  .quiz-option { background: rgba(0,0,0,0.2); border: 2px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; transition: transform 0.1s; }
   .quiz-option:active { transform: scale(0.95); }
 </style>
 </head>
@@ -94,8 +135,8 @@
       <button id="settingsBtn" class="btn-icon">⚙️</button>
       <button id="moreBtn" class="btn-icon">⋯</button>
 
-      <div id="moreMenu" style="display: none; position: absolute; right: 0; top: 45px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; width: 160px;">
-        <button id="themeBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🌙 Тема</button>
+      <div id="moreMenu" style="display: none; position: absolute; right: 0; top: 45px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; width: 160px; backdrop-filter: blur(12px);">
+        <button id="themeBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">☀️ Светлая</button>
         <button id="dayBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">💬 Мой день</button>
         <button id="quizBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🧩 Картинки</button>
         <button id="gameBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🎮 Флаги</button>
@@ -109,7 +150,7 @@
 
   <div class="actions">
     <button id="speakBtn" class="btn-speak" style="flex: 2;">Сказать</button>
-    <button id="shareBtn" class="btn-speak" style="background: #8b5cf6; flex: 1.5; font-size: 11px;">✈️ Поделиться</button>
+    <button id="shareBtn" class="btn-speak" style="background: rgba(139, 92, 246, 0.9); flex: 1.5; font-size: 11px;">✈️ Поделиться</button>
     <button id="backBtn" class="btn-back" style="flex: 1;">Стереть</button>
     <button id="clearBtn" class="btn-clear" style="flex: 1;">Сброс</button>
   </div>
@@ -149,8 +190,8 @@
   <div class="modal-box" style="max-width: 400px;">
     <h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🌍 Найди флаги</h2>
     <div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px;">
-      <button onclick="startGame(4)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer;">4x4</button>
-      <button onclick="startGame(5)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer;">5x4</button>
+      <button onclick="startGame(4)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer; color: var(--text);">4x4</button>
+      <button onclick="startGame(5)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer; color: var(--text);">5x4</button>
     </div>
     <div id="gameGrid" class="game-grid cols-4"></div>
     <div id="gameStatus" style="text-align:center; font-weight:bold; color:#059669; margin-bottom:10px; min-height: 24px;">Выбери сложность!</div>
@@ -515,7 +556,7 @@ function renderPhrases() {
   const list = document.getElementById('phrasesList');
   list.innerHTML = templates.map((p, idx) => `
     <div style="display: flex; gap: 8px; align-items: center;">
-      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
         <span style="font-size: 24px;">${p.icon}</span> <span style="line-height: 1.2;">${p.text}</span>
       </button>
       <button onclick="deleteTemplate(${idx})" style="padding: 12px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
@@ -584,8 +625,12 @@ function showStats() {
   document.body.appendChild(modal);
 }
 
-// --- 5. ИГРА ФЛАГИ ---
-const allFlags = ['ad','ae','af','ag','ai','al','am','ao','aq','ar','as','at','au','aw','ax','az','ba','bb','bd','be','bf','bg','bh','bi','bj','bl','bm','bn','bo','bq','br','bs','bt','bv','bw','by','bz','ca','cc','cd','cf','cg','ch','ci','ck','cl','cm','cn','co','cr','cu','cv','cw','cx','cy','cz','de','dj','dk','dm','do','dz','ec','ee','eg','eh','er','es','et','fi','fj','fk','fm','fo','fr','ga','gb','gd','ge','gf','gg','gh','gi','gl','gm','gn','gp','gq','gr','gs','gt','gu','gw','gy','hk','hm','hn','hr','ht','hu','id','ie','il','im','in','io','iq','ir','is','it','je','jm','jo','jp','ke','kg','kh','ki','km','kn','kp','kr','kw','ky','kz','la','lb','lc','li','lk','lr','ls','lt','lu','lv','ly','ma','mc','md','me','mf','mg','mh','mk','ml','mm','mn','mo','mp','mq','mr','ms','mt','mu','mv','mw','mx','my','mz','na','nc','ne','nf','ng','ni','nl','no','np','nr','nu','nz','om','pa','pe','pf','pg','ph','pk','pl','pm','pn','pr','ps','pt','pw','py','qa','re','ro','rs','ru','rw','sa','sb','sc','sd','se','sg','sh','si','sj','sk','sl','sm','sn','so','sr','ss','st','sv','sx','sy','sz','tc','td','tf','tg','th','tj','tk','tl','tm','tn','to','tr','tt','tv','tw','tz','ua','ug','um','us','uy','uz','va','vc','ve','vg','vi','vn','vu','wf','ws','ye','yt','za','zm','zw'];
+// --- 5. ИГРА ФЛАГИ С ОЗВУЧКОЙ СТРАН ---
+const countryNames = {
+  ad:'Андорра', ae:'ОАЭ', af:'Афганистан', ag:'Антигуа и Барбуда', ai:'Ангилья', al:'Албания', am:'Армения', ao:'Ангола', aq:'Антарктида', ar:'Аргентина', as:'Американское Самоа', at:'Австрия', au:'Австралия', aw:'Аруба', ax:'Аландские о-ва', az:'Азербайджан', ba:'Босния и Герцеговина', bb:'Барбадос', bd:'Бангладеш', be:'Бельгия', bf:'Буркина-Фасо', bg:'Болгария', bh:'Бахрейн', bi:'Бурунди', bj:'Бенин', bl:'Сен-Бартелеми', bm:'Бермудские о-ва', bn:'Бруней', bo:'Боливия', bq:'Бонайре', br:'Бразилия', bs:'Багамы', bt:'Бутан', bw:'Ботсвана', by:'Беларусь', bz:'Белиз', ca:'Канада', cc:'Кокосовые о-ва', cd:'Конго', cf:'ЦАР', cg:'Конго', ch:'Швейцария', ci:'Кот-д’Ивуар', ck:'Острова Кука', cl:'Чили', cm:'Камерун', cn:'Китай', co:'Колумбия', cr:'Коста-Рика', cu:'Куба', cv:'Кабо-Верде', cw:'Кюрасао', cx:'о-в Рождества', cy:'Кипр', cz:'Чехия', de:'Германия', dj:'Джибути', dk:'Дания', dm:'Доминика', do:'Доминикана', dz:'Алжир', ec:'Эквадор', ee:'Эстония', eg:'Египет', eh:'Западная Сахара', er:'Эритрея', es:'Испания', et:'Эфиопия', fi:'Финляндия', fj:'Фиджи', fk:'Фолклендские о-ва', fm:'Микронезия', fo:'Фарерские о-ва', fr:'Франция', ga:'Габон', gb:'Великобритания', gd:'Гренада', ge:'Грузия', gf:'Французская Гвиана', gg:'Гернси', gh:'Гана', gi:'Гибралтар', gl:'Гренландия', gm:'Гамбия', gn:'Гвинея', gp:'Гваделупа', gq:'Экваториальная Гвинея', gr:'Греция', gs:'Южная Георгия', gt:'Гватемала', gu:'Гуам', gw:'Гвинея-Бисау', gy:'Гайана', hk:'Гонконг', hm:'о-в Херд', hn:'Гондурас', hr:'Хорватия', ht:'Гаити', hu:'Венгрия', id:'Индонезия', ie:'Ирландия', il:'Израиль', im:'о-в Мэн', in:'Индия', io:'Британская территория', iq:'Ирак', ir:'Иран', is:'Исландия', it:'Италия', je:'Джерси', jm:'Ямайка', jo:'Иордания', jp:'Япония', ke:'Кения', kg:'Киргизия', kh:'Камбоджа', ki:'Кирибати', km:'Коморы', kn:'Сент-Китс и Невис', kp:'КНДР', kr:'Южная Корея', kw:'Кувейт', ky:'Каймановы о-ва', kz:'Казахстан', la:'Лаос', lb:'Ливан', lc:'Сент-Люсия', li:'Лихтенштейн', lk:'Шри-Ланка', lr:'Либерия', ls:'Лесото', lt:'Литва', lu:'Люксембург', lv:'Латвия', ly:'Ливия', ma:'Марокко', mc:'Монако', md:'Молдова', me:'Черногория', mf:'Сен-Мартен', mg:'Мадагаскар', mh:'Маршалловы О-ва', mk:'Северная Македония', ml:'Мали', mm:'Мьянма', mn:'Монголия', mo:'Макао', mp:'Северные Марианские о-ва', mq:'Мартиника', mr:'Мавритания', ms:'Монтсеррат', mt:'Мальта', mu:'Маврикий', mv:'Мальдивы', mw:'Малави', mx:'Мексика', my:'Малайзия', mz:'Мозамбик', na:'Намибия', nc:'Новая Каледония', ne:'Нигер', nf:'о-в Норфолк', ng:'Нигерия', ni:'Никарагуа', nl:'Нидерланды', no:'Норвегия', np:'Непал', nr:'Науру', nu:'Ниуэ', nz:'Новая Зеландия', om:'Оман', pa:'Панама', pe:'Перу', pf:'Французская Полинезия', pg:'Папуа — Новая Гвинея', ph:'Филиппины', pk:'Пакистан', pl:'Польша', pm:'Сен-Пьер и Микелон', pn:'о-ва Питкэрн', pr:'Пуэрто-Рико', ps:'Палестина', pt:'Португалия', pw:'Палау', py:'Парагвай', qa:'Катар', re:'Реюньон', ro:'Румыния', rs:'Сербия', ru:'Россия', rw:'Руанда', sa:'Саудовская Аравия', sb:'Соломоновы О-ва', sc:'Сейшельские О-ва', sd:'Судан', se:'Швеция', sg:'Сингапур', sh:'о-в Св. Елены', si:'Словения', sj:'Шпицберген', sk:'Словакия', sl:'Сьерра-Леоне', sm:'Сан-Марино', sn:'Сенегал', so:'Сомали', sr:'Суринам', ss:'Южный Судан', st:'Сан-Томе и Принсипи', sv:'Сальвадор', sx:'Синт-Мартен', sy:'Сирия', sz:'Эсватини', tc:'Тёркс и Кайкос', td:'Чад', tf:'Французские Южные территории', tg:'Того', th:'Таиланд', tj:'Таджикистан', tk:'Токелау', tl:'Восточный Тимор', tm:'Туркменистан', tn:'Тунис', to:'Тонга', tr:'Турция', tt:'Тринидад и Тобаго', tv:'Тувалу', tw:'Тайвань', tz:'Танзания', ua:'Украина', ug:'Уганда', um:'Внешние малые о-ва', us:'США', uy:'Уругвай', uz:'Узбекистан', va:'Ватикан', vc:'Сент-Винсент', ve:'Венесуэла', vg:'Британские Виргинские о-ва', vi:'Виргинские о-ва', vn:'Вьетнам', vu:'Вануату', wf:'Уоллис и Футуна', ws:'Самоа', ye:'Йемен', yt:'Майотта', za:'ЮАР', zm:'Замбия', zw:'Зимбабве'
+};
+const allFlags = Object.keys(countryNames);
+
 let gameCards = [], flippedCards = [], matchedPairs = 0, lockBoard = false, currentGameSize = 4;
 
 function startGame(size) {
@@ -612,8 +657,13 @@ function flipCard(index) {
   const card = document.getElementById(`card-${index}`);
   if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
   
+  // ОЗВУЧКА СТРАНЫ
+  const countryCode = gameCards[index];
+  const countryName = countryNames[countryCode] || "Страна";
+  speak(countryName);
+
   card.classList.add('flipped');
-  card.style.background = 'var(--primary-light)';
+  card.style.background = 'rgba(255,255,255,0.2)';
   card.style.borderColor = 'var(--primary)';
   card.querySelector('img').style.opacity = '1';
   flippedCards.push({ index, element: card, code: gameCards[index] });
@@ -625,7 +675,7 @@ function flipCard(index) {
     
     if (card1.code === card2.code) {
       card1.element.classList.add('matched'); card2.element.classList.add('matched');
-      card1.element.style.background = '#dcfce7'; card2.element.style.background = '#dcfce7';
+      card1.element.style.background = 'rgba(34, 197, 94, 0.4)'; card2.element.style.background = 'rgba(34, 197, 94, 0.4)';
       card1.element.style.borderColor = '#22c55e'; card2.element.style.borderColor = '#22c55e';
       matchedPairs++; flippedCards = []; lockBoard = false;
       
@@ -636,11 +686,11 @@ function flipCard(index) {
     } else {
       setTimeout(() => {
         card1.element.classList.remove('flipped'); card2.element.classList.remove('flipped');
-        card1.element.style.background = 'var(--bg)'; card2.element.style.background = 'var(--bg)';
+        card1.element.style.background = 'rgba(0,0,0,0.3)'; card2.element.style.background = 'rgba(0,0,0,0.3)';
         card1.element.style.borderColor = 'var(--border)'; card2.element.style.borderColor = 'var(--border)';
         card1.element.querySelector('img').style.opacity = '0'; card2.element.querySelector('img').style.opacity = '0';
         flippedCards = []; lockBoard = false;
-      }, 1000);
+      }, 1500);
     }
   }
 }
@@ -667,16 +717,16 @@ function startQuiz() {
 
 function checkQuizAnswer(selectedLabel, element) {
   if (selectedLabel === quizTargetItem.l) {
-    element.style.background = '#dcfce7'; element.style.borderColor = '#22c55e';
+    element.style.background = 'rgba(34, 197, 94, 0.4)'; element.style.borderColor = '#22c55e';
     document.getElementById('quizStatus').innerText = '🎉 Правильно!';
     document.getElementById('quizStatus').style.color = '#059669';
     speak('Молодец! Правильно!');
     setTimeout(() => { startQuiz(); }, 2000);
   } else {
-    element.style.background = '#fee2e2'; element.style.borderColor = '#dc2626';
+    element.style.background = 'rgba(239, 68, 68, 0.4)'; element.style.borderColor = '#dc2626';
     document.getElementById('quizStatus').innerText = '❌ Попробуй еще раз';
     document.getElementById('quizStatus').style.color = '#dc2626';
-    setTimeout(() => { element.style.background = 'var(--bg)'; element.style.borderColor = 'var(--border)'; }, 1000);
+    setTimeout(() => { element.style.background = 'rgba(0,0,0,0.2)'; element.style.borderColor = 'var(--border)'; }, 1000);
   }
 }
 document.getElementById('quizBtn').onclick = () => { startQuiz(); document.getElementById('quizModal').classList.add('active'); };
@@ -691,8 +741,7 @@ function renderQuickAccess() {
     if (!it) return;
     const div = document.createElement('div');
     div.className = 'suggest-card';
-    div.style.background = '#fff'; div.style.borderColor = 'var(--text)';
-    div.innerHTML = `${it.e} <span style="color:var(--text)">${it.l}</span>`;
+    div.innerHTML = `${it.e} <span>${it.l}</span>`;
     div.onclick = () => addItem(it.l);
     container.appendChild(div);
   });
@@ -711,7 +760,7 @@ document.getElementById('dayBtn').onclick = () => {
   speak("Чем ты сегодня занимался?");
   const container = document.getElementById('dayOptions');
   container.innerHTML = dayActivities.map((a, index) => `
-    <button id="day-btn-${index}" onclick="selectDayActivity(${index}, '${a.say}')" style="padding:14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; cursor:pointer; transition: 0.2s;">
+    <button id="day-btn-${index}" onclick="selectDayActivity(${index}, '${a.say}')" style="padding:14px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.05); color:var(--text); font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; cursor:pointer; transition: 0.2s;">
       <span style="font-size:24px;">${a.icon}</span> ${a.text}
     </button>
   `).join('') + `<button id="confirmDayBtn" style="display:none; margin-top:10px; padding:14px; border-radius:10px; border:none; background:#059669; color:#fff; font-weight:800; font-size:16px; cursor:pointer;">✅ Подтвердить</button>`;
@@ -719,9 +768,9 @@ document.getElementById('dayBtn').onclick = () => {
 };
 
 function selectDayActivity(index, sayText) {
-  document.querySelectorAll('[id^="day-btn-"]').forEach(btn => { btn.style.background = 'var(--surface)'; btn.style.borderColor = 'var(--border)'; });
+  document.querySelectorAll('[id^="day-btn-"]').forEach(btn => { btn.style.background = 'rgba(255,255,255,0.05)'; btn.style.borderColor = 'var(--border)'; });
   const selectedBtn = document.getElementById(`day-btn-${index}`);
-  selectedBtn.style.background = '#dcfce7'; selectedBtn.style.borderColor = '#22c55e';
+  selectedBtn.style.background = 'rgba(34, 197, 94, 0.4)'; selectedBtn.style.borderColor = '#22c55e';
   speak(sayText);
   const confirmBtn = document.getElementById('confirmDayBtn');
   confirmBtn.style.display = 'block';
@@ -762,6 +811,11 @@ document.addEventListener('click', (e) => {
   if (menu && !menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
 });
 
+document.getElementById('themeBtn').onclick = () => {
+  document.body.classList.toggle('light-mode');
+  document.getElementById('themeBtn').innerText = document.body.classList.contains('light-mode') ? '🌙 Тёмная' : '☀️ Светлая';
+};
+
 document.getElementById('shareBtn').onclick = async () => {
   if (phrase.length === 0) { speak("Сначала выберите слова"); return; }
   const textToShare = phrase.map(p => `${p.e} ${p.s}`).join(' ');
@@ -778,7 +832,6 @@ document.getElementById('speakBtn').onclick = () => { if (phrase.length) speak(p
 document.getElementById('backBtn').onclick = () => { if (phrase.length) { phrase.pop(); updateStrip(); } };
 document.getElementById('clearBtn').onclick = () => { phrase = []; updateStrip(); renderSuggestions([]); };
 document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('active');
-document.getElementById('themeBtn').onclick = () => document.body.classList.toggle('dark');
 document.getElementById('statsBtn').onclick = showStats;
 document.getElementById('voiceSelect').onchange = (e) => { selectedVoice = voices.find(v => v.voiceURI === e.target.value); };
 document.getElementById('testVoiceBtn').onclick = () => speak('Проверка голоса');
