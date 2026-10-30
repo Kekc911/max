@@ -11,19 +11,7 @@
   body { background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s; }
   
   @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
-  @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
   .anim-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-  .anim-slide { animation: slideUp 0.4s ease-out forwards; }
-
-  #welcomeScreen { position: fixed; inset: 0; background: var(--surface); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; transition: opacity 0.4s; }
-  #welcomeScreen.hide { opacity: 0; pointer-events: none; }
-  #welcomeScreen h1 { font-size: 28px; margin-bottom: 10px; font-weight: 800; }
-  #welcomeScreen p { font-size: 18px; color: var(--text-light); margin-bottom: 30px; font-weight: 500; }
-  .welcome-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 350px; }
-  .welcome-card { background: var(--bg); border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .welcome-card:active { transform: scale(0.95); }
-  .welcome-card .emoji { font-size: 50px; }
-  .welcome-card span { font-size: 16px; font-weight: 700; }
 
   #mainApp { display: flex; flex-direction: column; height: 100dvh; }
   header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 10; }
@@ -65,6 +53,7 @@
   .c-actions { border-bottom-color: #10b981; } .c-people { border-bottom-color: #eab308; }
   .c-food { border-bottom-color: #3b82f6; } .c-emotions { border-bottom-color: #8b5cf6; }
   .c-places { border-bottom-color: #14b8a6; } .c-things { border-bottom-color: #64748b; }
+  .c-game { border-bottom-color: #8b5cf6; }
 
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal.active { opacity: 1; pointer-events: auto; }
@@ -85,10 +74,6 @@
 </style>
 </head>
 <body>
-
-<div id="welcomeScreen">
-  <div id="welcomeContent" style="display: flex; flex-direction: column; align-items: center; width: 100%;"></div>
-</div>
 
 <div id="mainApp">
   <header>
@@ -117,24 +102,34 @@
     <button id="clearBtn" class="btn-clear">Сброс</button>
   </div>
 
+  <div class="suggestions-container" style="padding-bottom: 0;">
+    <div class="suggest-title">Быстрый доступ</div>
+    <div class="suggestions" id="quickAccess" style="min-height: 50px;"></div>
+  </div>
+
   <div class="suggestions-container" id="suggestionsContainer">
     <div class="suggest-title" id="suggestTitle" style="display:none;">Далее:</div>
     <div class="suggestions" id="suggestions"></div>
   </div>
 
-  <div class="suggestions-container" style="padding-bottom: 0;">
-    <div class="suggest-title">Быстрый доступ</div>
-    <div class="suggestions" id="quickAccess" style="min-height: 50px;"></div>
-  </div>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
+</div>
+
+<div id="dayModal" class="modal">
+  <div class="modal-box">
+    <h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Как прошел день?</h2>
+    <div id="dayOptions" style="display:flex; flex-direction:column; gap:8px;"></div>
+    <button onclick="document.getElementById('dayModal').classList.remove('active')" style="margin-top:10px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button>
+  </div>
 </div>
 
 <div id="phrasesModal" class="modal">
   <div class="modal-box">
     <h2 style="text-align:center; font-size:18px; margin-bottom: 10px;">Готовые фразы</h2>
     <div id="phrasesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-    <button onclick="document.getElementById('phrasesModal').classList.remove('active')" style="margin-top: 10px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
+    <button id="micBtn" style="margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#ec4899; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🎤 Добавить фразу голосом</button>
+    <button onclick="document.getElementById('phrasesModal').classList.remove('active')" style="margin-top: 5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
   </div>
 </div>
 
@@ -178,252 +173,148 @@
 </div>
 
 <script>
-// --- 1. ИНТЕРАКТИВНЫЙ СТАРТОВЫЙ ЭКРАН ---
-let step = 0; 
-
-function startGreeting() {
-  step = 1;
-  speak("Привет, Максим! Как твои дела?");
-  renderWelcomeStep();
-}
-
-function renderWelcomeStep() {
-  const container = document.getElementById('welcomeContent');
-  
-  if (step === 0) {
-    container.innerHTML = `
-      <h1 class="anim-slide">Привет, Максим!</h1>
-      <p class="anim-slide" style="animation-delay: 0.1s;">Как твои дела?</p>
-      <button onclick="startGreeting()" class="anim-pop" style="animation-delay: 0.2s; margin-bottom: 20px; padding: 15px 30px; font-size: 18px; font-weight: 800; color: #fff; background: #2563eb; border: none; border-radius: 12px; cursor: pointer;">
-        🔊 Нажми, чтобы начать
-      </button>
-    `;
-  }
-  
-  if (step === 1) {
-    container.innerHTML = `
-      <h1 class="anim-slide">Как настроение?</h1>
-      <div class="welcome-grid" style="margin-top:20px;">
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Настроение: Отлично', 'Отлично!', 2, 'Как спалось сегодня?')"><div class="emoji">😃</div><span>Отлично</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Настроение: Хорошо', 'Хорошо', 2, 'Как спалось сегодня?')"><div class="emoji">😊</div><span>Хорошо</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Настроение: Нормально', 'Нормально', 2, 'Как спалось сегодня?')"><div class="emoji">😐</div><span>Нормально</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Настроение: Плохо', 'Плохо', 2, 'Как спалось сегодня?')"><div class="emoji">😢</div><span>Плохо</span></div>
-      </div>
-    `;
-  }
-
-  if (step === 2) {
-    container.innerHTML = `
-      <h1 class="anim-slide">Как спалось?</h1>
-      <div class="welcome-grid" style="margin-top:20px;">
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Сон: Выспался', 'Выспался', 3, 'Чем займемся сегодня?')"><div class="emoji">😴</div><span>Выспался</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Сон: Не очень', 'Не очень', 3, 'Чем займемся сегодня?')"><div class="emoji">🥱</div><span>Не очень</span></div>
-        <div class="welcome-card anim-pop" style="grid-column: span 2;" onclick="answerQuestion('Сон: Плохо спал', 'Плохо спал', 3, 'Чем займемся сегодня?')"><div class="emoji">😫</div><span>Плохо спал</span></div>
-      </div>
-    `;
-  }
-
-  if (step === 3) {
-    container.innerHTML = `
-      <h1 class="anim-slide">Чем займемся?</h1>
-      <div class="welcome-grid" style="margin-top:20px;">
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Планы: Отдыхать', 'Отдыхать', 4, 'Хорошо! Переходим к общению.')"><div class="emoji">🛋️</div><span>Отдыхать</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Планы: Гулять', 'Гулять', 4, 'Хорошо! Переходим к общению.')"><div class="emoji">🌳</div><span>Гулять</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Планы: Играть', 'Играть', 4, 'Хорошо! Переходим к общению.')"><div class="emoji">🎮</div><span>Играть</span></div>
-        <div class="welcome-card anim-pop" onclick="answerQuestion('Планы: Смотреть ТВ', 'Смотреть ТВ', 4, 'Хорошо! Переходим к общению.')"><div class="emoji">📺</div><span>Смотреть ТВ</span></div>
-      </div>
-    `;
-  }
-
-  if (step === 4) {
-    container.innerHTML = `
-      <h1 class="anim-slide" style="color: #059669;">Отлично!</h1>
-      <p class="anim-slide" style="animation-delay: 0.1s;">Я всё записал. Нажимай, чтобы общаться.</p>
-      <button onclick="finishWelcome()" class="anim-pop" style="animation-delay: 0.2s; margin-top: 20px; padding: 15px 30px; font-size: 18px; font-weight: 800; color: #fff; background: #059669; border: none; border-radius: 12px; cursor: pointer;">
-        🚀 Начать общение
-      </button>
-    `;
-  }
-}
-
-function answerQuestion(logText, speakText, nextStep, nextQuestionText) {
-  speak(speakText);
-  logActivity(logText);
-  
-  setTimeout(() => {
-    step = nextStep;
-    renderWelcomeStep();
-    if (nextQuestionText) {
-      setTimeout(() => speak(nextQuestionText), 500);
-    }
-  }, 1000);
-}
-
-function finishWelcome() {
-  const welcome = document.getElementById('welcomeScreen');
-  welcome.classList.add('hide');
-  setTimeout(() => { welcome.style.display = 'none'; }, 400);
-}
-
-// --- 2. СТАТИСТИКА ---
-let activityStats = JSON.parse(localStorage.getItem('aac_stats')) || {};
-function logActivity(word) {
-  if (activityStats[word]) activityStats[word]++;
-  else activityStats[word] = 1;
-  localStorage.setItem('aac_stats', JSON.stringify(activityStats));
-}
-
-function showStats() {
-  const sorted = Object.entries(activityStats).sort((a, b) => b[1] - a[1]);
-  let statsHtml = '<h3 style="margin-bottom:10px;">Топ слов:</h3>';
-  
-  if (sorted.length === 0) {
-    statsHtml += '<p>Пока нет данных.</p>';
-  } else {
-    statsHtml += '<ul style="list-style: none; padding: 0;">';
-    sorted.slice(0, 10).forEach(([word, count]) => {
-      statsHtml += `<li style="padding: 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>${word}</span> <b>${count} раз</b></li>`;
-    });
-    statsHtml += '</ul>';
-  }
-
-  const modal = document.createElement('div');
-  modal.className = 'modal active';
-  modal.innerHTML = `
-    <div class="modal-box">
-      <h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Статистика</h2>
-      <div>${statsHtml}</div>
-      <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-// --- 3. СЛОВА ---
+// --- 1. СЛОВА (С КАТЕГОРИЕЙ ИГР) ---
 const items = [
-  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',t:{en:'I want'}, next:['Пить','Еда','Спать']},
-  {c:'needs',e:'🥤',l:'Пить',s:'пить',t:{en:'drink'}, next:['Вода','Пиво','Квас']},
-  {c:'needs',e:'🍽️',l:'Еда',s:'есть',t:{en:'eat'}, next:['Суши','Чипсики','Конфета']},
-  {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',t:{en:'toilet'}, next:['Помощь']},
-  {c:'needs',e:'🛏️',l:'Спать',s:'спать',t:{en:'sleep'}, next:['Помощь']},
-  {c:'needs',e:'🆘',l:'Помощь',s:'помогите',t:{en:'help me'}, next:['Мама','Папа','Братик']},
-  {c:'needs',e:'🤕',l:'Больно',s:'мне больно',t:{en:'it hurts'}, next:['Помощь']},
-  {c:'needs',e:'🤲',l:'Дать',s:'дайте',t:{en:'give'}, next:['Вода','Телефон']},
-  {c:'needs',e:'☝️',l:'Надо',s:'мне надо',t:{en:'I need'}, next:['Вода','Помощь']},
-  {c:'needs',e:'🛋️',l:'Отдых',s:'отдохнуть',t:{en:'rest'}, next:['Дом']},
-  {c:'needs',e:'🚑',l:'Врача',s:'вызовите врача',t:{en:'call a doctor'}, next:[]},
-  {c:'needs',e:'📱',l:'Телефон',s:'телефон',t:{en:'phone'}, next:[]},
-  {c:'needs',e:'💧',l:'Воды',s:'воды',t:{en:'water'}, next:[]},
-  {c:'needs',e:'🍔',l:'Поесть',s:'поесть',t:{en:'I want to eat'}, next:[]},
+  // Потребности (14)
+  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать']},
+  {c:'needs',e:'🥤',l:'Пить',s:'пить',next:['Вода','Пиво','Квас']},
+  {c:'needs',e:'🍽️',l:'Еда',s:'есть',next:['Суши','Чипсики','Конфета']},
+  {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',next:['Помощь']},
+  {c:'needs',e:'🛏️',l:'Спать',s:'спать',next:['Помощь']},
+  {c:'needs',e:'🆘',l:'Помощь',s:'помогите',next:['Мама','Папа','Братик']},
+  {c:'needs',e:'🤕',l:'Больно',s:'мне больно',next:['Помощь']},
+  {c:'needs',e:'🤲',l:'Дать',s:'дайте',next:['Вода','Телефон']},
+  {c:'needs',e:'☝️',l:'Надо',s:'мне надо',next:['Вода','Помощь']},
+  {c:'needs',e:'🛋️',l:'Отдых',s:'отдохнуть',next:['Дом']},
+  {c:'needs',e:'🚑',l:'Врача',s:'вызовите врача',next:[]},
+  {c:'needs',e:'📱',l:'Телефон',s:'телефон',next:[]},
+  {c:'needs',e:'💧',l:'Воды',s:'воды',next:[]},
+  {c:'needs',e:'🍔',l:'Поесть',s:'поесть',next:[]},
 
-  {c:'social',e:'👋',l:'Привет',s:'привет',t:{en:'hello'}, next:['Мама','Братик']},
-  {c:'social',e:'🖐️',l:'Пока',s:'пока',t:{en:'bye'}, next:[]},
-  {c:'social',e:'✅',l:'Да',s:'да',t:{en:'yes'}, next:[]},
-  {c:'social',e:'❌',l:'Нет',s:'нет',t:{en:'no'}, next:[]},
-  {c:'social',e:'🙏',l:'Спасибо',s:'спасибо',t:{en:'thank you'}, next:[]},
-  {c:'social',e:'🤝',l:'Пожалуйста',s:'пожалуйста',t:{en:'please'}, next:[]},
-  {c:'social',e:'👍',l:'Хорошо',s:'хорошо',t:{en:'okay'}, next:[]},
-  {c:'social',e:'👎',l:'Плохо',s:'плохо',t:{en:'bad'}, next:['Помощь']},
-  {c:'social',e:'😔',l:'Извини',s:'извини',t:{en:'sorry'}, next:[]},
-  {c:'social',e:'❤️',l:'Люблю',s:'люблю',t:{en:'I love you'}, next:['Мама','Папа','Братик']},
-  {c:'social',e:'✋',l:'Подожди',s:'подожди',t:{en:'wait'}, next:[]},
-  {c:'social',e:'👌',l:'Согласен',s:'согласен',t:{en:'agree'}, next:[]},
-  {c:'social',e:'🙅',l:'Не хочу',s:'не хочу',t:{en:'I don\'t want'}, next:[]},
-  {c:'social',e:'😊',l:'Здравствуйте',s:'здравствуйте',t:{en:'good day'}, next:[]},
+  // Общение (14)
+  {c:'social',e:'👋',l:'Привет',s:'привет',next:['Мама','Братик']},
+  {c:'social',e:'🖐️',l:'Пока',s:'пока',next:[]},
+  {c:'social',e:'✅',l:'Да',s:'да',next:[]},
+  {c:'social',e:'❌',l:'Нет',s:'нет',next:[]},
+  {c:'social',e:'🙏',l:'Спасибо',s:'спасибо',next:[]},
+  {c:'social',e:'🤝',l:'Пожалуйста',s:'пожалуйста',next:[]},
+  {c:'social',e:'👍',l:'Хорошо',s:'хорошо',next:[]},
+  {c:'social',e:'👎',l:'Плохо',s:'плохо',next:['Помощь']},
+  {c:'social',e:'😔',l:'Извини',s:'извини',next:[]},
+  {c:'social',e:'❤️',l:'Люблю',s:'люблю',next:['Мама','Папа','Братик']},
+  {c:'social',e:'✋',l:'Подожди',s:'подожди',next:[]},
+  {c:'social',e:'👌',l:'Согласен',s:'согласен',next:[]},
+  {c:'social',e:'🙅',l:'Не хочу',s:'не хочу',next:[]},
+  {c:'social',e:'😊',l:'Здравствуйте',s:'здравствуйте',next:[]},
 
-  {c:'actions',e:'🚶',l:'Идти',s:'идти',t:{en:'go'}, next:['Дом','Работа']},
-  {c:'actions',e:'🎮',l:'Играть',s:'играть',t:{en:'play'}, next:['Рюма','Братик']},
-  {c:'actions',e:'👀',l:'Смотреть',s:'смотреть',t:{en:'look'}, next:['ТВ','Книга']},
-  {c:'actions',e:'👂',l:'Слушать',s:'слушать',t:{en:'listen'}, next:['Музыка','ТВ']},
-  {c:'actions',e:'🤲',l:'Дать',s:'дать',t:{en:'give'}, next:['Вода','Печенье']},
-  {c:'actions',e:'🌳',l:'Гулять',s:'гулять',t:{en:'walk'}, next:['Улица','Парк', 'Рюма']},
-  {c:'actions',e:'🛋️',l:'Отдыхать',s:'отдохнуть',t:{en:'rest'}, next:['Дом']},
-  {c:'actions',e:'🏃',l:'Бегать',s:'бегать',t:{en:'run'}, next:['Улица']},
-  {c:'actions',e:'🫴',l:'Взять',s:'взять',t:{en:'take'}, next:['Телефон']},
-  {c:'actions',e:'👉',l:'Показать',s:'показать',t:{en:'show'}, next:['Мама','Папа']},
-  {c:'actions',e:'🗣️',l:'Поговорить',s:'хочу поговорить',t:{en:'talk'}, next:[]},
-  {c:'actions',e:'🤗',l:'Обнять',s:'обними меня',t:{en:'hug me'}, next:[]},
-  {c:'actions',e:'🚪',l:'Оставь меня',s:'оставь меня одного',t:{en:'leave me alone'}, next:[]},
-  {c:'actions',e:'🧑‍🤝‍🧑',l:'Побудь со мной',s:'побудь со мной',t:{en:'stay with me'}, next:[]},
+  // Действия (14)
+  {c:'actions',e:'🚶',l:'Идти',s:'идти',next:['Дом','Работа']},
+  {c:'actions',e:'🎮',l:'Играть',s:'играть',next:['Рюма','Братик']},
+  {c:'actions',e:'👀',l:'Смотреть',s:'смотреть',next:['ТВ','Книга']},
+  {c:'actions',e:'👂',l:'Слушать',s:'слушать',next:['Музыка','ТВ']},
+  {c:'actions',e:'🤲',l:'Дать',s:'дать',next:['Вода','Печенье']},
+  {c:'actions',e:'🌳',l:'Гулять',s:'гулять',next:['Улица','Парк', 'Рюма']},
+  {c:'actions',e:'🛋️',l:'Отдыхать',s:'отдохнуть',next:['Дом']},
+  {c:'actions',e:'🏃',l:'Бегать',s:'бегать',next:['Улица']},
+  {c:'actions',e:'🫴',l:'Взять',s:'взять',next:['Телефон']},
+  {c:'actions',e:'👉',l:'Показать',s:'показать',next:['Мама','Папа']},
+  {c:'actions',e:'🗣️',l:'Поговорить',s:'хочу поговорить',next:[]},
+  {c:'actions',e:'🤗',l:'Обнять',s:'обними меня',next:[]},
+  {c:'actions',e:'🚪',l:'Оставь меня',s:'оставь меня одного',next:[]},
+  {c:'actions',e:'🧑‍🤝‍🧑',l:'Побудь со мной',s:'побудь со мной',next:[]},
 
-  {c:'people',e:'👩',l:'Мама',s:'мама',t:{en:'mom'}, next:['Помощь','Люблю']},
-  {c:'people',e:'👨',l:'Папа',s:'папа',t:{en:'dad'}, next:['Помощь','Люблю']},
-  {c:'people',e:'👦',l:'Братик',s:'братик',t:{en:'brother'}, next:['Играть','Привет']},
-  {c:'people',e:'👵',l:'Бабушка',s:'бабушка',t:{en:'grandma'}, next:[]},
-  {c:'people',e:'👴',l:'Дедушка',s:'дедушка',t:{en:'grandpa'}, next:[]},
-  {c:'people',e:'👧',l:'Сестра',s:'сестра',t:{en:'sister'}, next:['Играть']},
-  {c:'people',e:'🧑‍🤝‍🧑',l:'Друг',s:'друг',t:{en:'friend'}, next:['Играть','Привет']},
-  {c:'people',e:'👭',l:'Подруга',s:'подруга',t:{en:'friend'}, next:['Играть','Привет']},
-  {c:'people',e:'🧑‍⚕️',l:'Врач',s:'врач',t:{en:'doctor'}, next:['Помощь']},
-  {c:'people',e:'👩‍🏫',l:'Учитель',s:'учитель',t:{en:'teacher'}, next:['Помощь']},
-  {c:'people',e:'🧑',l:'Я',s:'я',t:{en:'I'}, next:['Хочу','Идти']},
-  {c:'people',e:'🫵',l:'Ты',s:'ты',t:{en:'you'}, next:['Идти','Играть']},
-  {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',t:{en:'family'}, next:['Дом']},
-  {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',t:{en:'dog Ruma'}, next:['Кушать','Гулять']},
+  // Люди (14)
+  {c:'people',e:'👩',l:'Мама',s:'мама',next:['Помощь','Люблю']},
+  {c:'people',e:'👨',l:'Папа',s:'папа',next:['Помощь','Люблю']},
+  {c:'people',e:'👦',l:'Братик',s:'братик',next:['Играть','Привет']},
+  {c:'people',e:'👵',l:'Бабушка',s:'бабушка',next:[]},
+  {c:'people',e:'👴',l:'Дедушка',s:'дедушка',next:[]},
+  {c:'people',e:'👧',l:'Сестра',s:'сестра',next:['Играть']},
+  {c:'people',e:'🧑‍🤝‍🧑',l:'Друг',s:'друг',next:['Играть','Привет']},
+  {c:'people',e:'👭',l:'Подруга',s:'подруга',next:['Играть','Привет']},
+  {c:'people',e:'🧑‍⚕️',l:'Врач',s:'врач',next:['Помощь']},
+  {c:'people',e:'👩‍🏫',l:'Учитель',s:'учитель',next:['Помощь']},
+  {c:'people',e:'🧑',l:'Я',s:'я',next:['Хочу','Идти']},
+  {c:'people',e:'🫵',l:'Ты',s:'ты',next:['Идти','Играть']},
+  {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',next:['Дом']},
+  {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',next:['Кушать','Гулять']},
 
-  {c:'food',e:'💧',l:'Вода',s:'воду',t:{en:'water'}, next:['Пить']},
-  {c:'food',e:'🍎',l:'Яблоко',s:'яблоко',t:{en:'apple'}, next:['Еда']},
-  {c:'food',e:'🍞',l:'Хлеб',s:'хлеб',t:{en:'bread'}, next:['Еда']},
-  {c:'food',e:'🧃',l:'Сок',s:'сок',t:{en:'juice'}, next:['Пить']},
-  {c:'food',e:'🍲',l:'Суп',s:'суп',t:{en:'soup'}, next:['Еда']},
-  {c:'food',e:'🥣',l:'Каша',s:'кашу',t:{en:'porridge'}, next:['Еда']},
-  {c:'food',e:'🍵',l:'Чай',s:'чай',t:{en:'tea'}, next:['Пить']},
-  {c:'food',e:'🍖',l:'Мясо',s:'мясо',t:{en:'meat'}, next:['Еда']},
-  {c:'food',e:'🐟',l:'Рыба',s:'рыбу',t:{en:'fish'}, next:['Еда']},
-  {c:'food',e:'🍌',l:'Банан',s:'банан',t:{en:'banana'}, next:['Еда']},
-  {c:'food',e:'🍊',l:'Апельсин',s:'апельсин',t:{en:'orange'}, next:['Еда']},
-  {c:'food',e:'🧀',l:'Сыр',s:'сыр',t:{en:'cheese'}, next:['Еда']},
-  {c:'food',e:'🥛',l:'Молоко',s:'молоко',t:{en:'milk'}, next:['Пить']},
-  {c:'food',e:'☕',l:'Кофе',s:'кофе',t:{en:'coffee'}, next:['Пить']},
-  {c:'food',e:'🍣',l:'Суши',s:'суши',t:{en:'sushi'}, next:['Еда']},
-  {c:'food',e:'🍟',l:'Чипсики',s:'чипсики',t:{en:'chips'}, next:['Еда']},
-  {c:'food',e:'🍺',l:'Пиво',s:'пиво',t:{en:'beer'}, next:['Пить']},
-  {c:'food',e:'🥖',l:'Квас',s:'квас',t:{en:'kvass'}, next:['Пить']},
-  {c:'food',e:'🍬',l:'Конфета',s:'конфету',t:{en:'candy'}, next:['Еда']},
+  // Еда (19)
+  {c:'food',e:'💧',l:'Вода',s:'воду',next:['Пить']},
+  {c:'food',e:'🍎',l:'Яблоко',s:'яблоко',next:['Еда']},
+  {c:'food',e:'🍞',l:'Хлеб',s:'хлеб',next:['Еда']},
+  {c:'food',e:'🧃',l:'Сок',s:'сок',next:['Пить']},
+  {c:'food',e:'🍲',l:'Суп',s:'суп',next:['Еда']},
+  {c:'food',e:'🥣',l:'Каша',s:'кашу',next:['Еда']},
+  {c:'food',e:'🍵',l:'Чай',s:'чай',next:['Пить']},
+  {c:'food',e:'🍖',l:'Мясо',s:'мясо',next:['Еда']},
+  {c:'food',e:'🐟',l:'Рыба',s:'рыбу',next:['Еда']},
+  {c:'food',e:'🍌',l:'Банан',s:'банан',next:['Еда']},
+  {c:'food',e:'🍊',l:'Апельсин',s:'апельсин',next:['Еда']},
+  {c:'food',e:'🧀',l:'Сыр',s:'сыр',next:['Еда']},
+  {c:'food',e:'🥛',l:'Молоко',s:'молоко',next:['Пить']},
+  {c:'food',e:'☕',l:'Кофе',s:'кофе',next:['Пить']},
+  {c:'food',e:'🍣',l:'Суши',s:'суши',next:['Еда']},
+  {c:'food',e:'🍟',l:'Чипсики',s:'чипсики',next:['Еда']},
+  {c:'food',e:'🍺',l:'Пиво',s:'пиво',next:['Пить']},
+  {c:'food',e:'🥖',l:'Квас',s:'квас',next:['Пить']},
+  {c:'food',e:'🍬',l:'Конфета',s:'конфету',next:['Еда']},
 
-  {c:'emotions',e:'😊',l:'Радость',s:'мне радостно',t:{en:'I am happy'}, next:['Обнять', 'Играть']},
-  {c:'emotions',e:'😢',l:'Грусть',s:'мне грустно',t:{en:'I am sad'}, next:['Поговорить', 'Обнять', 'Побудь со мной']},
-  {c:'emotions',e:'😠',l:'Злость',s:'я злюсь',t:{en:'I am angry'}, next:['Оставь меня', 'Отдыхать']},
-  {c:'emotions',e:'😨',l:'Страх',s:'мне страшно',t:{en:'I am scared'}, next:['Обнять', 'Побудь со мной', 'Мама']},
-  {c:'emotions',e:'🥱',l:'Устал',s:'я устал',t:{en:'I am tired'}, next:['Спать', 'Оставь меня']},
-  {c:'emotions',e:'😌',l:'Спокойно',s:'мне спокойно',t:{en:'I am calm'}, next:[]},
-  {c:'emotions',e:'😄',l:'Весело',s:'мне весело',t:{en:'I am having fun'}, next:['Играть']},
-  {c:'emotions',e:'😞',l:'Обидно',s:'мне обидно',t:{en:'I am upset'}, next:['Поговорить', 'Обнять']},
-  {c:'emotions',e:'🥱',l:'Скучно',s:'мне скучно',t:{en:'I am bored'}, next:['Играть', 'Поговорить', 'Гулять']},
-  {c:'emotions',e:'😃',l:'Хорошо',s:'мне хорошо',t:{en:'I feel good'}, next:[]},
-  {c:'emotions',e:'😣',l:'Плохо',s:'мне плохо',t:{en:'I feel bad'}, next:['Помощь', 'Обнять']},
-  {c:'emotions',e:'😱',l:'Боюсь',s:'я боюсь',t:{en:'I am afraid'}, next:['Мама', 'Обнять']},
-  {c:'emotions',e:'😂',l:'Смешно',s:'мне смешно',t:{en:'it is funny'}, next:[]},
-  {c:'emotions',e:'😭',l:'Плакать',s:'я плачу',t:{en:'I am crying'}, next:['Помощь', 'Обнять', 'Поговорить']},
+  // Эмоции (14)
+  {c:'emotions',e:'😊',l:'Радость',s:'мне радостно',next:['Обнять', 'Играть']},
+  {c:'emotions',e:'😢',l:'Грусть',s:'мне грустно',next:['Поговорить', 'Обнять', 'Побудь со мной']},
+  {c:'emotions',e:'😠',l:'Злость',s:'я злюсь',next:['Оставь меня', 'Отдыхать']},
+  {c:'emotions',e:'😨',l:'Страх',s:'мне страшно',next:['Обнять', 'Побудь со мной', 'Мама']},
+  {c:'emotions',e:'🥱',l:'Устал',s:'я устал',next:['Спать', 'Оставь меня']},
+  {c:'emotions',e:'😌',l:'Спокойно',s:'мне спокойно',next:[]},
+  {c:'emotions',e:'😄',l:'Весело',s:'мне весело',next:['Играть']},
+  {c:'emotions',e:'😞',l:'Обидно',s:'мне обидно',next:['Поговорить', 'Обнять']},
+  {c:'emotions',e:'🥱',l:'Скучно',s:'мне скучно',next:['Играть', 'Поговорить', 'Гулять']},
+  {c:'emotions',e:'😃',l:'Хорошо',s:'мне хорошо',next:[]},
+  {c:'emotions',e:'😣',l:'Плохо',s:'мне плохо',next:['Помощь', 'Обнять']},
+  {c:'emotions',e:'😱',l:'Боюсь',s:'я боюсь',next:['Мама', 'Обнять']},
+  {c:'emotions',e:'😂',l:'Смешно',s:'мне смешно',next:[]},
+  {c:'emotions',e:'😭',l:'Плакать',s:'я плачу',next:['Помощь', 'Обнять', 'Поговорить']},
 
-  {c:'places',e:'🏠',l:'Дом',s:'домой',t:{en:'home'}, next:['Идти']},
-  {c:'places',e:'🏫',l:'Школа',s:'в школу',t:{en:'school'}, next:['Идти']},
-  {c:'places',e:'🛣️',l:'Улица',s:'на улицу',t:{en:'outside'}, next:['Идти']},
-  {c:'places',e:'⏰',l:'Сейчас',s:'сейчас',t:{en:'now'}, next:['Идти','Еда']},
-  {c:'places',e:'⏳',l:'Потом',s:'потом',t:{en:'later'}, next:[]},
-  {c:'places',e:'🌅',l:'Утро',s:'утром',t:{en:'morning'}, next:['Еда']},
-  {c:'places',e:'🌆',l:'Вечер',s:'вечером',t:{en:'evening'}, next:['Спать']},
-  {c:'places',e:'🌃',l:'Ночь',s:'ночью',t:{en:'night'}, next:['Спать']},
-  {c:'places',e:'🍳',l:'Кухня',s:'на кухне',t:{en:'kitchen'}, next:['Еда']},
-  {c:'places',e:'🛏️',l:'Спальня',s:'в спальне',t:{en:'bedroom'}, next:['Спать']},
-  {c:'places',e:'🌳',l:'Парк',s:'в парк',t:{en:'park'}, next:['Идти']},
-  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',t:{en:'store'}, next:['Идти']},
-  {c:'places',e:'🚽',l:'Туалет',s:'в туалет',t:{en:'toilet'}, next:['Идти']},
-  {c:'places',e:'💼',l:'Работа',s:'на работу',t:{en:'work'}, next:['Идти']},
+  // Места (14)
+  {c:'places',e:'🏠',l:'Дом',s:'домой',next:['Идти']},
+  {c:'places',e:'🏫',l:'Школа',s:'в школу',next:['Идти']},
+  {c:'places',e:'🛣️',l:'Улица',s:'на улицу',next:['Идти']},
+  {c:'places',e:'⏰',l:'Сейчас',s:'сейчас',next:['Идти','Еда']},
+  {c:'places',e:'⏳',l:'Потом',s:'потом',next:[]},
+  {c:'places',e:'🌅',l:'Утро',s:'утром',next:['Еда']},
+  {c:'places',e:'🌆',l:'Вечер',s:'вечером',next:['Спать']},
+  {c:'places',e:'🌃',l:'Ночь',s:'ночью',next:['Спать']},
+  {c:'places',e:'🍳',l:'Кухня',s:'на кухне',next:['Еда']},
+  {c:'places',e:'🛏️',l:'Спальня',s:'в спальне',next:['Спать']},
+  {c:'places',e:'🌳',l:'Парк',s:'в парк',next:['Идти']},
+  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',next:['Идти']},
+  {c:'places',e:'🚽',l:'Туалет',s:'в туалет',next:['Идти']},
+  {c:'places',e:'💼',l:'Работа',s:'на работу',next:['Идти']},
   
-  {c:'things',e:'🔑',l:'Ключи',s:'ключи',t:{en:'keys'}, next:[]},
-  {c:'things',e:'💵',l:'Деньги',s:'деньги',t:{en:'money'}, next:[]},
-  {c:'things',e:'👕',l:'Одежда',s:'одежду',t:{en:'clothes'}, next:[]},
-  {c:'things',e:'👟',l:'Обувь',s:'обувь',t:{en:'shoes'}, next:[]},
-  {c:'things',e:'💊',l:'Лекарство',s:'лекарство',t:{en:'medicine'}, next:[]},
-  {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',t:{en:'charger'}, next:[]},
-  {c:'things',e:'👓',l:'Очки',s:'очки',t:{en:'glasses'}, next:[]}
+  // Вещи (7)
+  {c:'things',e:'🔑',l:'Ключи',s:'ключи',next:[]},
+  {c:'things',e:'💵',l:'Деньги',s:'деньги',next:[]},
+  {c:'things',e:'👕',l:'Одежда',s:'одежду',next:[]},
+  {c:'things',e:'👟',l:'Обувь',s:'обувь',next:[]},
+  {c:'things',e:'💊',l:'Лекарство',s:'лекарство',next:[]},
+  {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',next:[]},
+  {c:'things',e:'👓',l:'Очки',s:'очки',next:[]},
+
+  // Игры (6)
+  {c:'game',e:'🎮',l:'Игры',s:'хочу играть в игры',next:['PlayStation','GTA 6']},
+  {c:'game',e:'🕹️',l:'PlayStation',s:'в плейстейшен',next:['Джойстик']},
+  {c:'game',e:'🚗',l:'GTA 6',s:'в гта',next:['Джойстик']},
+  {c:'game',e:'🕹️',l:'Джойстик',s:'дай джойстик',next:[]},
+  {c:'game',e:'🏆',l:'Выиграл',s:'я выиграл',next:[]},
+  {c:'game',e:'💥',l:'Проиграл',s:'я проиграл помоги',next:['Помощь']}
 ];
 
-const catNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи' };
-const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things' };
+const catNames = { needs:'✋ Потребности', social:'👋 Общение', actions:'🏃 Действия', people:'👨‍👩‍👧 Люди', food:'🍔 Еда', emotions:'😊 Эмоции', places:'🏠 Места', things:'🎒 Вещи', game:'🎮 Игры' };
+const catVoiceNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи', game:'Игры' };
+const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things', game:'c-game' };
 
-// --- 4. ГОТОВЫЕ ФРАЗЫ (30+ ШТУК) ---
+// --- 2. ГОТОВЫЕ ФРАЗЫ ---
 let templates = JSON.parse(localStorage.getItem('aac_templates'));
 if (!templates) {
   templates = [
@@ -454,9 +345,10 @@ if (!templates) {
     { text: "Обними меня", say: "обними меня", icon: "🤗" },
     { text: "Оставь меня одного", say: "оставь меня одного", icon: "🚪" },
     { text: "Побудь со мной", say: "побудь со мной", icon: "🧑‍🤝‍🧑" },
-    { text: "Мне грустно", say: "мне грустно", icon: "😢" },
-    { text: "Мне страшно", say: "мне страшно", icon: "😨" },
-    { text: "Я злюсь", say: "я злюсь", icon: "😠" },
+    { text: "Хочу играть в PlayStation", say: "хочу играть в плейстейшен", icon: "🎮" },
+    { text: "Включи GTA", say: "включи гта", icon: "🚗" },
+    { text: "Дай джойстик", say: "дай джойстик", icon: "🕹️" },
+    { text: "Я проиграл, помоги", say: "я проиграл помоги", icon: "💥" },
     { text: "Пойдем гулять", say: "пойдем гулять", icon: "🌳" },
     { text: "Хочу домой", say: "хочу домой", icon: "🏠" },
     { text: "Включи телевизор", say: "включи телевизор", icon: "📺" },
@@ -464,59 +356,11 @@ if (!templates) {
     { text: "Поиграем", say: "поиграем", icon: "🎮" }
   ];
 }
-
 function saveTemplates() { localStorage.setItem('aac_templates', JSON.stringify(templates)); }
 
-function renderPhrases() {
-  const list = document.getElementById('phrasesList');
-  list.innerHTML = templates.map((p, idx) => `
-    <div style="display: flex; gap: 8px; align-items: center;">
-      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-        <span style="font-size: 24px;">${p.icon}</span> <span style="line-height: 1.2;">${p.text}</span>
-      </button>
-      <button onclick="deleteTemplate(${idx})" style="padding: 12px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
-    </div>
-  `).join('');
-}
-
-function speakTemplate(idx) {
-  speak(templates[idx].say);
-  document.getElementById('phrasesModal').classList.remove('active');
-}
-
-function deleteTemplate(idx) {
-  templates.splice(idx, 1);
-  saveTemplates();
-  renderPhrases();
-}
-
-function addNewTemplate() {
-  const text = prompt("Введите текст новой фразы (например: Дайте яблоко):");
-  if (text) {
-    templates.push({ text: text, say: text.toLowerCase(), icon: "🗣️" });
-    saveTemplates();
-    renderPhrases();
-  }
-}
-
-document.getElementById('phrasesBtn').onclick = () => {
-  renderPhrases();
-  const box = document.querySelector('#phrasesModal .modal-box');
-  if (!document.getElementById('addTplBtn')) {
-    const btn = document.createElement('button');
-    btn.id = 'addTplBtn';
-    btn.style = "margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;";
-    btn.innerText = '+ Добавить свою фразу';
-    btn.onclick = addNewTemplate;
-    box.insertBefore(btn, box.lastElementChild);
-  }
-  document.getElementById('phrasesModal').classList.add('active');
-};
-
-// --- 5. СИСТЕМА ОЗВУЧКИ (ГОЛОСА) ---
+// --- 3. ОЗВУЧКА (ГОЛОСА) ---
 let voices = [];
 let selectedVoice = null;
-let isLarge = false;
 
 function loadVoices() {
   if (!('speechSynthesis' in window)) return;
@@ -526,11 +370,7 @@ function loadVoices() {
   
   let filtered = voices.filter(v => v.lang.toLowerCase().includes('ru'));
   const maleNames = ['юрий', 'дмитрий', 'павел', 'артем', 'петр', 'максим', 'иван', 'александр', 'yuri', 'dmitry', 'pavel', 'artem', 'male', 'муж'];
-  let maleVoices = filtered.filter(v => {
-    const name = v.name.toLowerCase();
-    return maleNames.some(maleName => name.includes(maleName));
-  });
-
+  let maleVoices = filtered.filter(v => maleNames.some(n => v.name.toLowerCase().includes(n)));
   if (maleVoices.length === 0) maleVoices = filtered; 
 
   if (maleVoices.length === 0) {
@@ -560,9 +400,10 @@ function speak(text) {
   }
 }
 
-// --- 6. ЛОГИКА ПРИЛОЖЕНИЯ ---
+// --- 4. ОСНОВНАЯ ЛОГИКА (СЕТКА, ФРАЗЫ) ---
 let phrase = [];
 let activeCat = 'needs';
+let isLarge = false;
 
 function render() {
   document.getElementById('tabs').innerHTML = Object.keys(catNames).map(key => 
@@ -587,17 +428,30 @@ function render() {
   renderSuggestions();
 }
 
-function setCat(cat) { activeCat = cat; render(); }
+function setCat(cat) {
+  activeCat = cat;
+  render();
+  if (catVoiceNames[cat]) speak(catVoiceNames[cat]);
+}
 
 function addItem(label) {
   const item = items.find(i => i.l === label);
   if (!item) return;
   
-  logActivity(item.l);
+  // Статистика
+  let stats = JSON.parse(localStorage.getItem('aac_stats')) || {};
+  stats[item.l] = (stats[item.l] || 0) + 1;
+  localStorage.setItem('aac_stats', JSON.stringify(stats));
   
   phrase.push(item);
   updateStrip();
-  speak(item.s);
+  
+  // Умные предложения
+  if (item.l === 'Пить' || item.l === 'Еда' || item.l === 'Спать' || item.l === 'Туалет') {
+    speak("Я хочу " + item.s);
+  } else {
+    speak(item.s);
+  }
   
   if (item.next && item.next.length > 0) {
     renderSuggestions(item.next);
@@ -645,6 +499,81 @@ function removeItem(idx) {
   updateStrip();
 }
 
+// --- 5. ГОТОВЫЕ ФРАЗЫ (ОТРИСОВКА И ДОБАВЛЕНИЕ) ---
+function renderPhrases() {
+  const list = document.getElementById('phrasesList');
+  list.innerHTML = templates.map((p, idx) => `
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <span style="font-size: 24px;">${p.icon}</span> <span style="line-height: 1.2;">${p.text}</span>
+      </button>
+      <button onclick="deleteTemplate(${idx})" style="padding: 12px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
+    </div>
+  `).join('');
+}
+
+function speakTemplate(idx) {
+  speak(templates[idx].say);
+  document.getElementById('phrasesModal').classList.remove('active');
+}
+
+function deleteTemplate(idx) {
+  templates.splice(idx, 1);
+  saveTemplates();
+  renderPhrases();
+}
+
+function addNewTemplate() {
+  const text = prompt("Введите текст новой фразы (например: Дайте яблоко):");
+  if (text) {
+    templates.push({ text: text, say: text.toLowerCase(), icon: "🗣️" });
+    saveTemplates();
+    renderPhrases();
+  }
+}
+
+document.getElementById('phrasesBtn').onclick = () => {
+  renderPhrases();
+  const box = document.querySelector('#phrasesModal .modal-box');
+  if (!document.getElementById('addTplBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'addTplBtn';
+    btn.style = "margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;";
+    btn.innerText = '+ Добавить свою фразу текстом';
+    btn.onclick = addNewTemplate;
+    box.insertBefore(btn, box.lastElementChild);
+  }
+  document.getElementById('phrasesModal').classList.add('active');
+};
+
+// --- 6. СТАТИСТИКА ---
+function showStats() {
+  const stats = JSON.parse(localStorage.getItem('aac_stats')) || {};
+  const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+  let statsHtml = '<h3 style="margin-bottom:10px;">Топ слов:</h3>';
+  
+  if (sorted.length === 0) {
+    statsHtml += '<p>Пока нет данных.</p>';
+  } else {
+    statsHtml += '<ul style="list-style: none; padding: 0;">';
+    sorted.slice(0, 10).forEach(([word, count]) => {
+      statsHtml += `<li style="padding: 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>${word}</span> <b>${count} раз</b></li>`;
+    });
+    statsHtml += '</ul>';
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Статистика</h2>
+      <div>${statsHtml}</div>
+      <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
 // --- 7. ИГРА 1: НАЙДИ ФЛАГИ ---
 const allFlags = ['🇷🇺', '🇪🇪', '🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇨🇳', '🇮🇹', '🇪🇸', '🇨🇦', '🇧🇷', '🇦🇺', '🇮🇳', '🇰🇷', '🇲🇽', '🇿🇦', '🇦🇷', '🇹🇷', '🇸🇪', '🇳🇴', '🇩🇰', '🇫🇮', '🇵🇱', '🇺🇦', '🇰🇿', '🇬🇪', '🇦🇲', '🇱🇻', '🇱🇹', '🇮🇱', '🇸🇦', '🇦🇪', '🇪🇬', '🇬🇷', '🇵🇹', '🇳🇱', '🇧🇪', '🇨🇭', '🇦🇹'];
 let gameCards = [];
@@ -656,23 +585,19 @@ let currentGameSize = 4;
 function startGame(size) {
   currentGameSize = size;
   const pairsCount = size === 4 ? 8 : 10;
-  
   const selectedFlags = [...allFlags].sort(() => 0.5 - Math.random()).slice(0, pairsCount);
   gameCards = [...selectedFlags, ...selectedFlags].sort(() => 0.5 - Math.random());
-  
   flippedCards = [];
   matchedPairs = 0;
   lockBoard = false;
   
   const grid = document.getElementById('gameGrid');
   grid.className = `game-grid cols-${size}`;
-  
   grid.innerHTML = gameCards.map((flag, index) => `
     <div class="game-card" id="card-${index}" onclick="flipCard(${index})">
       <span>${flag}</span>
     </div>
   `).join('');
-  
   document.getElementById('gameStatus').innerText = 'Найди все пары!';
 }
 
@@ -680,14 +605,12 @@ function flipCard(index) {
   if (lockBoard) return;
   const card = document.getElementById(`card-${index}`);
   const flag = gameCards[index];
-  
   if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
   
   card.classList.add('flipped');
   card.style.background = 'var(--primary-light)';
   card.style.borderColor = 'var(--primary)';
   card.querySelector('span').style.opacity = '1';
-  
   flippedCards.push({ index, flag, element: card });
   
   if (flippedCards.length === 2) {
@@ -702,7 +625,6 @@ function flipCard(index) {
       card2.element.style.background = '#dcfce7';
       card1.element.style.borderColor = '#22c55e';
       card2.element.style.borderColor = '#22c55e';
-      
       matchedPairs++;
       flippedCards = [];
       lockBoard = false;
@@ -721,7 +643,6 @@ function flipCard(index) {
         card2.element.style.borderColor = 'var(--border)';
         card1.element.querySelector('span').style.opacity = '0';
         card2.element.querySelector('span').style.opacity = '0';
-        
         flippedCards = [];
         lockBoard = false;
       }, 1000);
@@ -752,7 +673,6 @@ function startQuiz() {
       ${opt.e}
     </div>
   `).join('');
-  
   speak(`Найди ${quizTargetItem.l}`);
 }
 
@@ -781,44 +701,99 @@ document.getElementById('quizBtn').onclick = () => {
   document.getElementById('quizModal').classList.add('active');
 };
 
-// --- 9. ОБРАБОТЧИКИ КНОПОК ---
-document.getElementById('speakBtn').onclick = () => {
-  if (phrase.length) speak(phrase.map(p => p.s).join(' '));
-};
-document.getElementById('backBtn').onclick = () => {
-  if (phrase.length) { phrase.pop(); updateStrip(); }
-};
-document.getElementById('clearBtn').onclick = () => {
-  phrase = [];
-  updateStrip();
-  renderSuggestions([]);
+// --- 9. БЫСТРЫЙ ДОСТУП ---
+const quickWords = ['Вода', 'Туалет', 'Мама', 'Помощь', 'Собачка Рюма'];
+function renderQuickAccess() {
+  const container = document.getElementById('quickAccess');
+  container.innerHTML = '';
+  quickWords.forEach(wordLabel => {
+    const it = items.find(i => i.l === wordLabel);
+    if (!it) return;
+    const div = document.createElement('div');
+    div.className = 'suggest-card';
+    div.style.background = '#fff'; 
+    div.style.borderColor = 'var(--text)';
+    div.innerHTML = `${it.e} <span style="color:var(--text)">${it.l}</span>`;
+    div.onclick = () => addItem(it.l);
+    container.appendChild(div);
+  });
+}
+
+// --- 10. ОКНО "МОЙ ДЕНЬ" ---
+const dayActivities = [
+  { text: "Играл в PlayStation", say: "я играл в плейстейшен", icon: "🎮" },
+  { text: "Гулял с Рюмой", say: "я гулял с Рюмой", icon: "🐶" },
+  { text: "Кушал суши", say: "я кушал суши", icon: "🍣" },
+  { text: "Смотрел телевизор", say: "я смотрел телевизор", icon: "📺" }
+];
+document.getElementById('dayBtn').onclick = () => {
+  speak("Чем ты сегодня занимался?");
+  const container = document.getElementById('dayOptions');
+  container.innerHTML = dayActivities.map(a => `
+    <button onclick="speak('${a.say}'); document.getElementById('dayModal').classList.remove('active');" style="padding:14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+      <span style="font-size:24px;">${a.icon}</span> ${a.text}
+    </button>
+  `).join('');
+  document.getElementById('dayModal').classList.add('active');
 };
 
+// --- 11. ГОЛОСОВОЕ ДОБАВЛЕНИЕ ФРАЗ ---
+let recognition;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ru-RU';
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    templates.push({ text: text, say: text, icon: "🗣️" });
+    saveTemplates(); renderPhrases();
+    speak("Добавлено: " + text);
+    document.getElementById('phrasesModal').classList.add('active');
+  };
+}
+document.getElementById('micBtn').onclick = () => {
+  if (recognition) {
+    document.getElementById('phrasesModal').classList.remove('active');
+    speak("Говорите");
+    setTimeout(() => recognition.start(), 1500); 
+  }
+};
+
+// --- 12. МЕНЮ С ТРЕМЯ ТОЧКАМИ ---
+document.getElementById('moreBtn').onclick = (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('moreMenu');
+  menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+};
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('moreMenu');
+  const btn = document.getElementById('moreBtn');
+  if (menu && !menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
+});
+
+// --- 13. ОБРАБОТЧИКИ КНОПОК ---
+document.getElementById('speakBtn').onclick = () => { if (phrase.length) speak(phrase.map(p => p.s).join(' ')); };
+document.getElementById('backBtn').onclick = () => { if (phrase.length) { phrase.pop(); updateStrip(); } };
+document.getElementById('clearBtn').onclick = () => { phrase = []; updateStrip(); renderSuggestions([]); };
 document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('active');
 document.getElementById('themeBtn').onclick = () => document.body.classList.toggle('dark');
 document.getElementById('statsBtn').onclick = showStats;
-
-document.getElementById('voiceSelect').onchange = (e) => {
-  selectedVoice = voices.find(v => v.voiceURI === e.target.value);
-};
-
+document.getElementById('voiceSelect').onchange = (e) => { selectedVoice = voices.find(v => v.voiceURI === e.target.value); };
 document.getElementById('testVoiceBtn').onclick = () => speak('Проверка голоса');
-
 document.getElementById('sizeBtn').onclick = (e) => {
   isLarge = !isLarge;
   e.target.innerText = isLarge ? 'Вкл' : 'Выкл';
   document.getElementById('grid').classList.toggle('big', isLarge);
 };
 
-// --- 10. ЗАПУСК ---
+// --- 14. ЗАПУСК ---
 if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
   setTimeout(loadVoices, 300);
 }
 
 render();
-step = 0;
-renderWelcomeStep();
+renderQuickAccess();
 </script>
 </body>
 </html>
