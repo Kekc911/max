@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Коммуникатор</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f172a">
 <style>
   @keyframes gradientBG {
     0% { background-position: 0% 50%; }
@@ -13,7 +18,7 @@
 
   :root { 
     --bg: #0f172a; 
-    --surface: rgba(30, 41, 59, 0.75); /* Эффект жидкого стекла */
+    --surface: rgba(30, 41, 59, 0.75);
     --text: #f8fafc; 
     --text-light: #cbd5e1; 
     --border: rgba(255, 255, 255, 0.15); 
@@ -117,7 +122,16 @@
   }
   .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); transform: translateY(-2px); }
 
-  .grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 0 16px 16px; overflow-y: auto; align-content: start; }
+  .grid { 
+    flex: 1; 
+    min-height: 0; 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+    gap: 10px; 
+    padding: 0 16px 120px 16px;
+    overflow-y: auto; 
+    align-content: start; 
+  }
   .grid.big { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
   
   .card { 
@@ -134,7 +148,6 @@
   .card span { font-weight: 700; font-size: 12px; text-align: center; line-height: 1.2; color: var(--text); }
   .grid.big .card span { font-size: 14px; }
 
-  /* Анимации */
   @keyframes popIn { 0% { opacity: 0; transform: scale(0.7); } 100% { opacity: 1; transform: scale(1); } }
   @keyframes slideInUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
   @keyframes flipIn { 0% { opacity: 0; transform: perspective(400px) rotateX(90deg); } 100% { opacity: 1; transform: perspective(400px) rotateX(0deg); } }
@@ -157,6 +170,7 @@
   .c-game { border-bottom-color: #d946ef; } 
   .c-questions { border-bottom-color: #ef4444; }
   .c-numbers { border-bottom-color: #f97316; }
+  .c-animals { border-bottom-color: #84cc16; }
 
   .modal { 
     position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
@@ -289,7 +303,7 @@
 <script>
 const items = [
   // Потребности
-  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать','Туалет']},
+  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать','Туалет','Гулять','Играть','Смотреть','Слушать','Купить','Поговорить','Обнять','Домой']},
   {c:'needs',e:'🥤',l:'Пить',s:'пить',next:['Вода','Сок','Чай','Кофе','Пиво','Квас']},
   {c:'needs',e:'🍽️',l:'Еда',s:'есть',next:['Суши','Пицца','Суп','Каша','Булки','Чипсики']},
   {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',next:['Помощь']},
@@ -303,6 +317,15 @@ const items = [
   {c:'needs',e:'📱',l:'Телефон',s:'телефон',next:[]},
   {c:'needs',e:'💧',l:'Воды',s:'воды',next:[]},
   {c:'needs',e:'🍔',l:'Поесть',s:'поесть',next:[]},
+  {c:'needs',e:'👤',l:'Голова',s:'голова',next:['Больно']},
+  {c:'needs',e:'💪',l:'Рука',s:'рука',next:['Больно']},
+  {c:'needs',e:'🦵',l:'Нога',s:'нога',next:['Больно']},
+  {c:'needs',e:'👁️',l:'Глаз',s:'глаз',next:['Больно']},
+  {c:'needs',e:'👂',l:'Ухо',s:'ухо',next:['Больно']},
+  {c:'needs',e:'👄',l:'Рот',s:'рот',next:['Больно']},
+  {c:'needs',e:'🦷',l:'Зуб',s:'зуб',next:['Больно']},
+  {c:'needs',e:'👃',l:'Нос',s:'нос',next:['Больно']},
+  {c:'needs',e:'🫃',l:'Живот',s:'живот',next:['Больно']},
 
   // Общение
   {c:'social',e:'👋',l:'Привет',s:'привет',next:['Иляха','Мама']},
@@ -340,6 +363,17 @@ const items = [
   {c:'actions',e:'🚪',l:'Оставь меня',s:'оставь меня одного',next:[]},
   {c:'actions',e:'🧑‍🤝‍🧑',l:'Побудь со мной',s:'побудь со мной',next:[]},
   {c:'actions',e:'🕹️',l:'Включить',s:'включить',next:['GTA 6','PlayStation']},
+  {c:'actions',e:'🏊',l:'Плавать',s:'плавать',next:[]},
+  {c:'actions',e:'🚴',l:'Кататься',s:'кататься',next:[]},
+  {c:'actions',e:'🚿',l:'Мыться',s:'мыться',next:[]},
+  {c:'actions',e:'🪥',l:'Чистить зубы',s:'чистить зубы',next:[]},
+  {c:'actions',e:'🍳',l:'Готовить',s:'готовить',next:[]},
+  {c:'actions',e:'🧹',l:'Убирать',s:'убирать',next:[]},
+  {c:'actions',e:'🎨',l:'Рисовать',s:'рисовать',next:[]},
+  {c:'actions',e:'🎵',l:'Петь',s:'петь',next:[]},
+  {c:'actions',e:'💃',l:'Танцевать',s:'танцевать',next:[]},
+  {c:'actions',e:'📖',l:'Читать',s:'читать',next:[]},
+  {c:'actions',e:'✍️',l:'Писать',s:'писать',next:[]},
 
   // Люди
   {c:'people',e:'👩',l:'Мама',s:'мама',next:['Помощь','Люблю']},
@@ -358,7 +392,7 @@ const items = [
   {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',next:['Дом']},
   {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',next:['Кушать','Гулять']},
 
-  // Еда и продукты
+  // Еда
   {c:'food',e:'💧',l:'Вода',s:'воду',next:['Пить']},
   {c:'food',e:'🍎',l:'Яблоко',s:'яблоко',next:['Еда']},
   {c:'food',e:'🍞',l:'Хлеб',s:'хлеб',next:['Еда']},
@@ -399,6 +433,14 @@ const items = [
   {c:'emotions',e:'😱',l:'Боюсь',s:'я боюсь',next:['Мама','Обнять']},
   {c:'emotions',e:'😂',l:'Смешно',s:'мне смешно',next:[]},
   {c:'emotions',e:'😭',l:'Плакать',s:'я плачу',next:['Помощь','Обнять']},
+  {c:'emotions',e:'🤩',l:'Восторг',s:'восторг',next:[]},
+  {c:'emotions',e:'😡',l:'Бесит',s:'бесит',next:[]},
+  {c:'emotions',e:'😳',l:'Стыдно',s:'стыдно',next:[]},
+  {c:'emotions',e:'🤔',l:'Думаю',s:'думаю',next:[]},
+  {c:'emotions',e:'😎',l:'Гордость',s:'гордость',next:[]},
+  {c:'emotions',e:'🥶',l:'Замёрз',s:'замёрз',next:[]},
+  {c:'emotions',e:'🥵',l:'Жарко',s:'жарко',next:[]},
+  {c:'emotions',e:'😇',l:'Спокойно',s:'спокойно',next:[]},
 
   // Места
   {c:'places',e:'🏠',l:'Дом',s:'домой',next:['Идти']},
@@ -416,16 +458,82 @@ const items = [
   {c:'places',e:'🚽',l:'Туалет',s:'в туалет',next:['Идти']},
   {c:'places',e:'💼',l:'Работа',s:'на работу',next:['Идти']},
   {c:'places',e:'📅',l:'Пятница',s:'пятница',next:[]},
-  
+  {c:'places',e:'🚗',l:'Машина',s:'машина',next:[]},
+  {c:'places',e:'🚌',l:'Автобус',s:'автобус',next:[]},
+  {c:'places',e:'🚲',l:'Велосипед',s:'велосипед',next:[]},
+  {c:'places',e:'✈️',l:'Самолет',s:'самолет',next:[]},
+  {c:'places',e:'🚂',l:'Поезд',s:'поезд',next:[]},
+  {c:'places',e:'🚢',l:'Корабль',s:'корабль',next:[]},
+  {c:'places',e:'🚑',l:'Скорая',s:'скорая',next:[]},
+  {c:'places',e:'🚓',l:'Полиция',s:'полиция',next:[]},
+  {c:'places',e:'🚕',l:'Такси',s:'такси',next:[]},
+  {c:'places',e:'🚁',l:'Вертолет',s:'вертолет',next:[]},
+  {c:'places',e:'🛴',l:'Самокат',s:'самокат',next:[]},
+  {c:'places',e:'☀️',l:'Солнце',s:'солнце',next:[]},
+  {c:'places',e:'🌧️',l:'Дождь',s:'дождь',next:[]},
+  {c:'places',e:'❄️',l:'Снег',s:'снег',next:[]},
+  {c:'places',e:'🌪️',l:'Ветер',s:'ветер',next:[]},
+  {c:'places',e:'🔥',l:'Огонь',s:'огонь',next:[]},
+  {c:'places',e:'🌊',l:'Море',s:'море',next:[]},
+  {c:'places',e:'⛰️',l:'Горы',s:'горы',next:[]},
+  {c:'places',e:'🌲',l:'Лес',s:'лес',next:[]},
+  {c:'places',e:'🌙',l:'Луна',s:'луна',next:[]},
+  {c:'places',e:'⭐',l:'Звезда',s:'звезда',next:[]},
+  {c:'places',e:'☁️',l:'Облако',s:'облако',next:[]},
+
   // Вещи
   {c:'things',e:'🔑',l:'Ключи',s:'ключи',next:[]},
   {c:'things',e:'💵',l:'Деньги',s:'деньги',next:[]},
-  {c:'things',e:'👕',l:'Одежда',s:'одежду',next:[]},
-  {c:'things',e:'👟',l:'Обувь',s:'обувь',next:[]},
+  {c:'things',e:'💳',l:'Карта',s:'карта',next:[]},
+  {c:'things',e:'👕',l:'Футболка',s:'футболка',next:[]},
+  {c:'things',e:'👖',l:'Штаны',s:'штаны',next:[]},
+  {c:'things',e:'🧥',l:'Куртка',s:'куртка',next:[]},
+  {c:'things',e:'👟',l:'Кроссовки',s:'кроссовки',next:[]},
+  {c:'things',e:'🧢',l:'Кепка',s:'кепка',next:[]},
+  {c:'things',e:'🧦',l:'Носки',s:'носки',next:[]},
+  {c:'things',e:'🧤',l:'Перчатки',s:'перчатки',next:[]},
+  {c:'things',e:'⌚',l:'Часы',s:'часы',next:[]},
+  {c:'things',e:'🎒',l:'Рюкзак',s:'рюкзак',next:[]},
+  {c:'things',e:'🎧',l:'Наушники',s:'наушники',next:[]},
+  {c:'things',e:'📱',l:'Смартфон',s:'смартфон',next:[]},
+  {c:'things',e:'💻',l:'Ноутбук',s:'ноутбук',next:[]},
+  {c:'things',e:'🛋️',l:'Диван',s:'диван',next:[]},
+  {c:'things',e:'🛏️',l:'Кровать',s:'кровать',next:[]},
+  {c:'things',e:'🚪',l:'Дверь',s:'дверь',next:[]},
+  {c:'things',e:'🪟',l:'Окно',s:'окно',next:[]},
+  {c:'things',e:'🔦',l:'Фонарик',s:'фонарик',next:[]},
   {c:'things',e:'💊',l:'Лекарство',s:'лекарство',next:[]},
   {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',next:[]},
   {c:'things',e:'👓',l:'Очки',s:'очки',next:[]},
   {c:'things',e:'🛍️',l:'Пакет',s:'пакет',next:[]},
+  {c:'things',e:'🔴',l:'Красный',s:'красный',next:[]},
+  {c:'things',e:'🔵',l:'Синий',s:'синий',next:[]},
+  {c:'things',e:'🟢',l:'Зеленый',s:'зеленый',next:[]},
+  {c:'things',e:'🟡',l:'Желтый',s:'желтый',next:[]},
+  {c:'things',e:'⚫',l:'Черный',s:'черный',next:[]},
+  {c:'things',e:'⚪',l:'Белый',s:'белый',next:[]},
+
+  // Животные
+  {c:'animals',e:'🐱',l:'Кошка',s:'кошка',next:[]},
+  {c:'animals',e:'🐶',l:'Собака',s:'собака',next:[]},
+  {c:'animals',e:'🐭',l:'Мышь',s:'мышь',next:[]},
+  {c:'animals',e:'🐰',l:'Кролик',s:'кролик',next:[]},
+  {c:'animals',e:'🦊',l:'Лиса',s:'лиса',next:[]},
+  {c:'animals',e:'🐻',l:'Медведь',s:'медведь',next:[]},
+  {c:'animals',e:'🐼',l:'Панда',s:'панда',next:[]},
+  {c:'animals',e:'🐯',l:'Тигр',s:'тигр',next:[]},
+  {c:'animals',e:'🦁',l:'Лев',s:'лев',next:[]},
+  {c:'animals',e:'🐮',l:'Корова',s:'корова',next:[]},
+  {c:'animals',e:'🐷',l:'Свинья',s:'свинья',next:[]},
+  {c:'animals',e:'🐔',l:'Курица',s:'курица',next:[]},
+  {c:'animals',e:'🐦',l:'Птица',s:'птица',next:[]},
+  {c:'animals',e:'🐴',l:'Лошадь',s:'лошадь',next:[]},
+  {c:'animals',e:'🐘',l:'Слон',s:'слон',next:[]},
+  {c:'animals',e:'🐒',l:'Обезьяна',s:'обезьяна',next:[]},
+  {c:'animals',e:'🦓',l:'Зебра',s:'зебра',next:[]},
+  {c:'animals',e:'🦒',l:'Жираф',s:'жираф',next:[]},
+  {c:'animals',e:'🐸',l:'Лягушка',s:'лягушка',next:[]},
+  {c:'animals',e:'🐢',l:'Черепаха',s:'черепаха',next:[]},
 
   // Игры
   {c:'game',e:'🎮',l:'Игры',s:'хочу играть в игры',next:['PlayStation','GTA 6']},
@@ -457,23 +565,21 @@ const items = [
   {c:'questions',e:'🗺️',l:'Где находится?',s:'где находится',next:[]}
 ];
 
-const catNames = { needs:'✋ Потребности', social:'👋 Общение', actions:'🏃 Действия', people:'👨‍👩‍👧 Люди', food:'🍔 Еда', emotions:'😊 Эмоции', places:'🏠 Места', things:'🎒 Вещи', game:'🎮 Игры', questions:'❓ Вопросы', numbers:'🔢 Цифры' };
-const catVoiceNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи', game:'Игры', questions:'Вопросы', numbers:'Цифры' };
-const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things', game:'c-game', questions:'c-questions', numbers:'c-numbers' };
+const catNames = { needs:'✋ Потребности', social:'👋 Общение', actions:'🏃 Действия', people:'👨‍👩‍👧 Люди', food:'🍔 Еда', emotions:'😊 Эмоции', places:'🏠 Места', things:'🎒 Вещи', game:'🎮 Игры', questions:'❓ Вопросы', numbers:'🔢 Цифры', animals:'🐾 Животные' };
+const catVoiceNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи', game:'Игры', questions:'Вопросы', numbers:'Цифры', animals:'Животные' };
+const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things', game:'c-game', questions:'c-questions', numbers:'c-numbers', animals:'c-animals' };
 
-// Готовые фразы, разбитые на категории
+// Готовые фразы с категориями
 let templates = JSON.parse(localStorage.getItem('aac_templates'));
 if (!templates) {
   templates = [
-    // МАГАЗИН
     { text: "Я хочу купить", say: "я хочу купить", icon: "🛒", cat: "Магазин" },
     { text: "Сколько это стоит?", say: "сколько это стоит", icon: "💰", cat: "Магазин" },
     { text: "Мне нужен пакет", say: "мне нужен пакет", icon: "🛍️", cat: "Магазин" },
     { text: "Можно оплатить картой?", say: "можно оплатить картой", icon: "💳", cat: "Магазин" },
     { text: "Дайте пожалуйста чек", say: "дайте пожалуйста чек", icon: "🧾", cat: "Магазин" },
     { text: "Спасибо, до свидания", say: "спасибо, до свидания", icon: "👋", cat: "Магазин" },
-    
-    // ИГРЫ И ОБЩЕНИЕ
+
     { text: "Я играю в GTA", say: "я играю в гэ тэ а", icon: "🚗", cat: "Игры" },
     { text: "Включи PlayStation", say: "включи плейстейшен", icon: "🎮", cat: "Игры" },
     { text: "Эй, Иляха!", say: "эй, Иляха", icon: "📣", cat: "Игры" },
@@ -481,18 +587,15 @@ if (!templates) {
     { text: "Давай дааай!", say: "давай дааай", icon: "🤲", cat: "Игры" },
     { text: "Ура, пятница!", say: "ура, пятница!", icon: "📅", cat: "Игры" },
 
-    // ПОМОЩЬ И ВАЖНОЕ
     { text: "Мне больно, помогите", say: "мне больно помогите", icon: "🤕", cat: "Помощь" },
     { text: "Мне нужно в туалет", say: "мне нужно в туалет", icon: "🚽", cat: "Помощь" },
     { text: "Где мои очки?", say: "где мои очки", icon: "👓", cat: "Помощь" },
     { text: "Позовите маму", say: "позовите маму", icon: "👩", cat: "Помощь" },
     { text: "Позовите папу", say: "позовите папу", icon: "👨", cat: "Помощь" },
 
-    // РЮМА
     { text: "Рюма, иди кушать", say: "Рюма, иди кушать", icon: "🐶", cat: "Рюма" },
     { text: "Рюма, гулять", say: "Рюма, гулять", icon: "🦴", cat: "Рюма" },
 
-    // ЕДА
     { text: "Хочу пить", say: "хочу пить", icon: "🥤", cat: "Еда" },
     { text: "Хочу есть", say: "хочу есть", icon: "🍽️", cat: "Еда" },
     { text: "Хочу суши", say: "хочу суши", icon: "🍣", cat: "Еда" },
