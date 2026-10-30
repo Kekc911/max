@@ -3,129 +3,90 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Коммуникатор</title>
 <style>
-  /* ТЕМНАЯ ТЕМА И ЦВЕТА ПО УМОЛЧАНИЮ */
-  :root { 
-    --bg: transparent; 
-    --surface: rgba(30, 41, 59, 0.85); 
-    --text: #f8fafc; 
-    --text-light: #94a3b8; 
-    --border: rgba(255, 255, 255, 0.15); 
-    --primary: #3b82f6; 
-    --primary-light: rgba(59, 130, 246, 0.2); 
-  }
+  :root { --bg: #f1f5f9; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; --primary: #2563eb; --primary-light: #eff6ff; }
+  body.dark { --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; --primary: #3b82f6; --primary-light: #172554; }
   
-  /* СВЕТЛАЯ ТЕМА (по кнопке) */
-  body.light-mode { 
-    --bg: #f8fafc; 
-    --surface: #ffffff; 
-    --text: #0f172a; 
-    --text-light: #64748b; 
-    --border: #e2e8f0; 
-    --primary: #2563eb; 
-    --primary-light: #eff6ff; 
-  }
-
   * { box-sizing: border-box; margin: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; transition: background 0.3s; }
   
-  /* ПЛАВНЫЙ RGB ФОН */
-  @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  body { 
-    background: linear-gradient(-45deg, #0f172a, #2e1065, #172554, #064e3b);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    color: var(--text); 
-    min-height: 100vh; 
-    display: flex; flex-direction: column; 
-    overflow-y: auto; overflow-x: hidden; 
-    transition: color 0.3s; 
-    -webkit-overflow-scrolling: touch; 
-  }
-  body.light-mode {
-    background: #f8fafc;
-    animation: none;
-  }
-
-  /* ЭФФЕКТ МАТОВОГО СТЕКЛА ДЛЯ ПАНЕЛЕЙ */
-  header, .strip, .card, .modal-box, .actions button, .suggest-card {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
   @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
   .anim-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-  #mainApp { display: flex; flex-direction: column; flex: 1; padding-bottom: 20px; }
+  #mainApp { display: flex; flex-direction: column; flex: 1; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: none; box-shadow: 0 4px 15px rgba(0,0,0,0.03); z-index: 20; flex-shrink: 0; position: sticky; top: 0; }
+  body.dark header { background: rgba(30, 41, 59, 0.85); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
   
-  header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
-  header h1 { font-size: 16px; font-weight: 800; }
+  header h1 { font-size: 14px; font-weight: 800; white-space: nowrap; }
   .header-actions { display: flex; gap: 4px; position: relative; }
-  .btn-icon { background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
-  body.light-mode .btn-icon { background: #f8fafc; }
+  
+  .btn-icon { background: var(--bg); border: none; border-radius: 12px; padding: 8px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.1s, background 0.2s; display: flex; align-items: center; justify-content: center; }
+  .btn-icon:active { transform: scale(0.9); background: var(--border); }
   
   .strip-container { padding: 10px 14px 0; }
-  .strip { min-height: 50px; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+  .strip { min-height: 50px; padding: 8px; background: var(--surface); border: none; border-radius: 16px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
   .strip::-webkit-scrollbar { display: none; }
-  .chip { background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  .chip { background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
   
-  .actions { display: flex; gap: 6px; padding: 10px 14px; }
-  .actions button { padding: 12px 2px; border: none; border-radius: 8px; font-weight: 700; font-size: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-  .btn-speak { background: rgba(5, 150, 105, 0.9); } 
-  .btn-back { background: rgba(217, 119, 6, 0.9); } 
-  .btn-clear { background: rgba(220, 38, 38, 0.9); }
+  .actions { display: flex; gap: 6px; padding: 10px 14px; position: relative; z-index: 10; background: transparent; flex-shrink: 0; }
+  .actions button { padding: 12px 4px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; color: #fff; cursor: pointer; flex: 1; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.1s, filter 0.2s; display: flex; align-items: center; justify-content: center; }
+  .actions button:active { transform: scale(0.95); filter: brightness(0.9); }
+  .btn-speak { background: linear-gradient(135deg, #10b981, #059669); } .btn-back { background: linear-gradient(135deg, #f59e0b, #d97706); } .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); }
 
   .suggestions-container { padding: 0 14px 10px; }
   .suggest-title { font-size: 11px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; }
   .suggestions { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-height: 40px; align-items: center; }
   .suggestions::-webkit-scrollbar { display: none; }
-  .suggest-card { background: var(--surface); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+  .suggest-card { background: var(--primary-light); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
   .suggest-card span { font-weight: 600; font-size: 13px; color: var(--primary); }
 
   .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; }
-  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .tab { padding: 8px 14px; border-radius: 20px; border: none; background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+  .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; padding: 0 14px 14px; align-content: start; }
   .grid.big { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; aspect-ratio: 1/1; border-bottom: 3px solid var(--border); transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-  .card:active { transform: scale(0.92); }
+  
+  .card { background: var(--surface); border: none; border-radius: 18px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; aspect-ratio: 1/1; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.1s; position: relative; overflow: hidden; }
+  body.dark .card { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .card:active { transform: scale(0.92); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .card .emoji { font-size: 32px; line-height: 1; margin-bottom: 6px; }
   .grid.big .card .emoji { font-size: 44px; }
   .card span { font-weight: 600; font-size: 11px; text-align: center; line-height: 1.1; }
   .grid.big .card span { font-size: 13px; }
+  
+  .card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: var(--border); }
+  .card.c-needs::after { background: #f59e0b; } .card.c-social::after { background: #ec4899; }
+  .card.c-actions::after { background: #10b981; } .card.c-people::after { background: #eab308; }
+  .card.c-food::after { background: #3b82f6; } .card.c-emotions::after { background: #8b5cf6; }
+  .card.c-places::after { background: #14b8a6; } .card.c-things::after { background: #64748b; }
+  .card.c-game::after { background: #8b5cf6; } .card.c-questions::after { background: #ef4444; }
 
-  .c-needs { border-bottom-color: #f59e0b; } .c-social { border-bottom-color: #ec4899; }
-  .c-actions { border-bottom-color: #10b981; } .c-people { border-bottom-color: #eab308; }
-  .c-food { border-bottom-color: #3b82f6; } .c-emotions { border-bottom-color: #8b5cf6; }
-  .c-places { border-bottom-color: #14b8a6; } .c-things { border-bottom-color: #64748b; }
-  .c-game { border-bottom-color: #8b5cf6; } .c-questions { border-bottom-color: #ef4444; }
-
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal.active { opacity: 1; pointer-events: auto; }
-  .modal-box { background: var(--surface); padding: 20px; border-radius: 12px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.2s; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); }
+  .modal-box { background: var(--surface); padding: 20px; border-radius: 16px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 10px; transform: translateY(20px); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
   .modal.active .modal-box { transform: translateY(0); }
-  .modal-box label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
-  select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: var(--text); font-size: 14px; }
-  body.light-mode select { background: #f8fafc; }
+  .modal-box label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; margin-top: 5px; }
+  select, input[type="text"], input[type="tel"], textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; }
 
   .game-grid { display: grid; gap: 8px; margin-bottom: 15px; }
   .game-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
   .game-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
-  .game-card { aspect-ratio: 1/1; background: rgba(0,0,0,0.3); border: 2px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-  .game-card img { width: 80%; height: auto; opacity: 0; transition: opacity 0.2s; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .game-card { aspect-ratio: 1/1; background: var(--bg); border: 2px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: 0.2s; }
+  .game-card span { opacity: 0; transition: opacity 0.2s; }
 
   .quiz-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
-  .quiz-option { background: rgba(0,0,0,0.2); border: 2px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; transition: transform 0.1s; }
+  .quiz-option { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; transition: transform 0.1s; }
   .quiz-option:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
+
+<canvas id="confettiCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;"></canvas>
 
 <div id="mainApp">
   <header>
@@ -135,11 +96,15 @@
       <button id="settingsBtn" class="btn-icon">⚙️</button>
       <button id="moreBtn" class="btn-icon">⋯</button>
 
-      <div id="moreMenu" style="display: none; position: absolute; right: 0; top: 45px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; width: 160px; backdrop-filter: blur(12px);">
-        <button id="themeBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">☀️ Светлая</button>
-        <button id="dayBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">💬 Мой день</button>
-        <button id="quizBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🧩 Картинки</button>
-        <button id="gameBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🎮 Флаги</button>
+      <div id="moreMenu" style="display: none; position: absolute; right: 0; top: 50px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; flex-direction: column; gap: 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 100; width: 180px;">
+        <button id="themeBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🌙 Тема</button>
+        <button id="dayBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">💬 Мой день</button>
+        <button id="firstThenBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">⏭️ Сначала-Потом</button>
+        <button id="readClipboardBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">📖 Прочитать текст</button>
+        <button id="quizBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🧩 Картинки</button>
+        <button id="gameBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🎮 Флаги</button>
+        <button id="tictactoeBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">❌⭕ Крестики-нолики</button>
+        <button id="aboutMeBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%; color: #dc2626; font-weight: 800;">🆘 Обо мне</button>
       </div>
     </div>
   </header>
@@ -150,7 +115,7 @@
 
   <div class="actions">
     <button id="speakBtn" class="btn-speak" style="flex: 2;">Сказать</button>
-    <button id="shareBtn" class="btn-speak" style="background: rgba(139, 92, 246, 0.9); flex: 1.5; font-size: 11px;">✈️ Поделиться</button>
+    <button id="shareBtn" class="btn-speak" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); flex: 1.5; font-size: 11px;">✈️ Поделиться</button>
     <button id="backBtn" class="btn-back" style="flex: 1;">Стереть</button>
     <button id="clearBtn" class="btn-clear" style="flex: 1;">Сброс</button>
   </div>
@@ -169,63 +134,31 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<div id="dayModal" class="modal">
-  <div class="modal-box">
-    <h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Как прошел день?</h2>
-    <div id="dayOptions" style="display:flex; flex-direction:column; gap:8px;"></div>
-    <button onclick="document.getElementById('dayModal').classList.remove('active')" style="margin-top:10px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button>
-  </div>
-</div>
+<!-- МОДАЛЬНЫЕ ОКНА -->
+<div id="dayModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Как прошел день?</h2><div id="dayOptions" style="display:flex; flex-direction:column; gap:8px;"></div><button onclick="document.getElementById('dayModal').classList.remove('active')" style="margin-top:10px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button></div></div>
 
-<div id="phrasesModal" class="modal">
-  <div class="modal-box">
-    <h2 style="text-align:center; font-size:18px; margin-bottom: 10px;">Готовые фразы</h2>
-    <div id="phrasesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-    <button id="micBtn" style="margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#ec4899; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🎤 Добавить фразу голосом</button>
-    <button onclick="document.getElementById('phrasesModal').classList.remove('active')" style="margin-top: 5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
-  </div>
-</div>
+<div id="firstThenModal" class="modal"><div class="modal-box" style="max-width: 400px;"><h2 style="text-align:center; font-size:20px; margin-bottom: 15px;">⏭️ Сначала - Потом</h2><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;"><div style="flex: 1; text-align: center;"><div style="font-weight: bold; margin-bottom: 5px; color: var(--text-light);">Сначала:</div><select id="firstSelect" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 14px;"></select><div id="firstDisplay" style="font-size: 60px; min-height: 80px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 2px solid var(--border); border-radius: 12px;">❓</div></div><div style="font-size: 30px; color: var(--primary); font-weight: bold;">➡️</div><div style="flex: 1; text-align: center;"><div style="font-weight: bold; margin-bottom: 5px; color: var(--text-light);">Потом:</div><select id="thenSelect" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 14px;"></select><div id="thenDisplay" style="font-size: 60px; min-height: 80px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 2px solid var(--border); border-radius: 12px;">❓</div></div></div><button onclick="speakFirstThen()" style="margin-top: 20px; padding:14px; border-radius:10px; border:none; background:#059669; color:#fff; font-weight:800; font-size:16px; cursor:pointer;">🔊 Сказать</button><button onclick="document.getElementById('firstThenModal').classList.remove('active')" style="margin-top: 5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
 
-<div id="gameModal" class="modal">
-  <div class="modal-box" style="max-width: 400px;">
-    <h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🌍 Найди флаги</h2>
-    <div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px;">
-      <button onclick="startGame(4)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer; color: var(--text);">4x4</button>
-      <button onclick="startGame(5)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer; color: var(--text);">5x4</button>
-    </div>
-    <div id="gameGrid" class="game-grid cols-4"></div>
-    <div id="gameStatus" style="text-align:center; font-weight:bold; color:#059669; margin-bottom:10px; min-height: 24px;">Выбери сложность!</div>
-    <button onclick="startGame(currentGameSize)" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔄 Новая игра</button>
-    <button onclick="document.getElementById('gameModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Выйти</button>
-  </div>
-</div>
+<div id="readClipboardModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">📖 Прочитать текст</h2><textarea id="clipboardText" placeholder="Вставьте текст сюда..." style="min-height:100px; resize:vertical;"></textarea><button id="pasteAutoBtn" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📋 Вставить из буфера</button><button id="readAgainBtn" style="margin-top:5px; padding:14px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:15px; cursor:pointer;">🔊 Прочитать вслух</button><button onclick="document.getElementById('readClipboardModal').classList.remove('active'); window.speechSynthesis.cancel();" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
 
-<div id="quizModal" class="modal">
-  <div class="modal-box" style="max-width: 380px;">
-    <h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🧩 Найди картинку</h2>
-    <div style="text-align:center; font-size: 18px; color: var(--text-light); margin-bottom: 10px;">Где находится...</div>
-    <div id="quizTarget" style="text-align:center; font-size: 36px; font-weight: 800; margin-bottom: 10px; color: var(--primary);">Яблоко</div>
-    <div id="quizOptions" class="quiz-options"></div>
-    <div id="quizStatus" style="text-align:center; font-weight:bold; color:#059669; margin-top:15px; min-height: 24px;"></div>
-    <button onclick="document.getElementById('quizModal').classList.remove('active')" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Выйти</button>
-  </div>
-</div>
+<div id="aboutMeModal" class="modal"><div class="modal-box" style="background: #dc2626; color: white; text-align: center; border: 4px solid white;"><h1 style="font-size: 30px; margin-bottom: 15px;">🆘 ОБО МНЕ</h1><div id="aboutMeContent" style="font-size: 20px; font-weight: bold; line-height: 1.5; margin-bottom: 20px;"></div><button onclick="speakAboutMe();" style="padding:15px; border-radius:10px; border:none; background:white; color:#dc2626; font-weight:800; font-size:18px; cursor:pointer; width: 100%; margin-bottom: 10px;">🔊 Прочитать вслух</button><button onclick="document.getElementById('aboutMeModal').classList.remove('active')" style="padding:15px; border-radius:10px; border:none; background:rgba(0,0,0,0.2); color:white; font-weight:800; font-size:16px; cursor:pointer; width: 100%;">Закрыть</button></div></div>
 
-<div id="settingsModal" class="modal">
-  <div class="modal-box">
-    <h2 style="text-align:center; font-size:16px;">Настройки</h2>
-    <label>Голос</label>
-    <select id="voiceSelect"><option>Загрузка...</option></select>
-    <label>Скорость <input type="range" id="rate" min="0.5" max="1.8" step="0.1" value="1" style="width:100px;"></label>
-    <label>Тон <input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="0.7" style="width:100px;"></label>
-    <label>Крупный шрифт <button id="sizeBtn" class="btn-icon">Выкл</button></label>
-    <button id="statsBtn" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📊 Моя статистика</button>
-    <button id="testVoiceBtn" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔊 Проверить голос</button>
-    <button onclick="document.getElementById('settingsModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
-  </div>
-</div>
+<div id="setupAboutModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Настройка "Обо мне"</h2><p style="font-size:12px; color:var(--text-light); margin-bottom:10px;">Эти данные сохранятся только на этом телефоне.</p><label>Имя</label><input type="text" id="setupName" placeholder="Максим"><label>Телефон для связи</label><input type="tel" id="setupPhone" placeholder="+7 999 123-45-67"><label>Адрес (если нужно)</label><input type="text" id="setupAddress" placeholder="ул. Ленина, д. 1"><button onclick="saveAboutMe()" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;">💾 Сохранить</button><button onclick="document.getElementById('setupAboutModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Отмена</button></div></div>
+
+<div id="tictactoeModal" class="modal"><div class="modal-box" style="max-width: 350px; text-align: center;"><h2 style="font-size:20px; margin-bottom: 10px;">❌⭕ Игра на двоих</h2><div style="display: flex; justify-content: space-around; margin-bottom: 15px; font-size: 18px; font-weight: bold;"><span style="color: #2563eb;">❌: <span id="score-x">0</span></span><span style="color: #dc2626;">⭕: <span id="score-o">0</span></span></div><div id="ttt-status" style="font-weight: bold; margin-bottom: 15px; font-size: 16px; color: var(--primary);">Ходят крестики (❌)</div><div id="ttt-board" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;"></div><button onclick="resetTTT()" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; margin-bottom: 10px; cursor:pointer;">🔄 Начать заново</button><button onclick="document.getElementById('tictactoeModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Выйти</button></div></div>
+
+<div id="phrasesModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom: 10px;">Готовые фразы</h2><div id="phrasesList" style="display: flex; flex-direction: column; gap: 8px;"></div><button id="micBtn" style="margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#ec4899; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🎤 Добавить фразу голосом</button><button onclick="document.getElementById('phrasesModal').classList.remove('active')" style="margin-top: 5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
+
+<div id="gameModal" class="modal"><div class="modal-box" style="max-width: 400px;"><h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🌍 Найди флаги</h2><div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px;"><button onclick="startGame(4)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer;">4x4</button><button onclick="startGame(5)" style="padding:8px 16px; border-radius:8px; border:none; background:var(--bg); font-weight:bold; cursor:pointer;">5x4</button></div><div id="gameGrid" class="game-grid cols-4"></div><div id="gameStatus" style="text-align:center; font-weight:bold; color:#059669; margin-bottom:10px; min-height: 24px;">Выбери сложность!</div><button onclick="startGame(currentGameSize)" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔄 Новая игра</button><button onclick="document.getElementById('gameModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Выйти</button></div></div>
+
+<div id="quizModal" class="modal"><div class="modal-box" style="max-width: 380px;"><h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🧩 Найди картинку</h2><div style="text-align:center; font-size: 18px; color: var(--text-light); margin-bottom: 10px;">Где находится...</div><div id="quizTarget" style="text-align:center; font-size: 36px; font-weight: 800; margin-bottom: 10px; color: var(--primary);">Яблоко</div><div id="quizOptions" class="quiz-options"></div><div id="quizStatus" style="text-align:center; font-weight:bold; color:#059669; margin-top:15px; min-height: 24px;"></div><button onclick="document.getElementById('quizModal').classList.remove('active')" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Выйти</button></div></div>
+
+<div id="addWordModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Новое слово</h2><label>Название слова</label><input type="text" id="newWordTitle" placeholder="Например: Шаурма"><label>Эмодзи (картинка)</label><input type="text" id="newWordEmoji" placeholder="Например: 🌯"><label>Категория</label><select id="newWordCategory"><option value="needs">✋ Потребности</option><option value="food">🍔 Еда</option><option value="actions">🏃 Действия</option><option value="people">👨‍👩‍👧 Люди</option><option value="emotions">😊 Эмоции</option><option value="places">🏠 Места</option><option value="things">🎒 Вещи</option><option value="game">🎮 Игры</option></select><button onclick="saveNewWord()" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;">💾 Сохранить</button><button onclick="document.getElementById('addWordModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Отмена</button></div></div>
+
+<div id="settingsModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:16px;">Настройки</h2><label>Голос</label><select id="voiceSelect"><option>Загрузка...</option></select><label>Скорость <input type="range" id="rate" min="0.5" max="1.8" step="0.1" value="1" style="width:100px;"></label><label>Тон <input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="0.7" style="width:100px;"></label><label>Крупный шрифт <button id="sizeBtn" class="btn-icon">Выкл</button></label><button onclick="document.getElementById('setupAboutModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#f59e0b; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:5px;">⚙️ Настроить "Обо мне"</button><button onclick="document.getElementById('addWordModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">➕ Добавить слово</button><button id="statsBtn" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📊 Статистика</button><button id="testVoiceBtn" style="padding:12px; border-radius:8px; border:none; background:#8b5cf6; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔊 Проверить голос</button><button onclick="clearCacheAndReload()" style="padding:12px; border-radius:8px; border:none; background:#ef4444; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔄 Обновить приложение</button><button onclick="document.getElementById('settingsModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
 
 <script>
+
 // --- 1. СЛОВА ---
 const items = [
   {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать']},
@@ -340,11 +273,11 @@ const items = [
   {c:'places',e:'🍳',l:'Кухня',s:'на кухне',next:['Еда']},
   {c:'places',e:'🛏️',l:'Спальня',s:'в спальне',next:['Спать']},
   {c:'places',e:'🌳',l:'Парк',s:'в парк',next:['Идти']},
-  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',next:['Идти']},
+  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',next:['Купить']},
+  {c:'places',e:'🏪',l:'Магазин',s:'в магазин',next:['Купить','Булки']},
   {c:'places',e:'🚽',l:'Туалет',s:'в туалет',next:['Идти']},
   {c:'places',e:'💼',l:'Работа',s:'на работу',next:['Идти']},
   {c:'places',e:'📅',l:'Пятница',s:'пятница',next:[]},
-  {c:'places',e:'🏪',l:'Магазин',s:'в магазин',next:['Купить','Булки','Деньги']},
   
   {c:'things',e:'🔑',l:'Ключи',s:'ключи',next:[]},
   {c:'things',e:'💵',l:'Деньги',s:'деньги',next:[]},
@@ -377,19 +310,18 @@ const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', peo
 let templates = JSON.parse(localStorage.getItem('aac_templates'));
 if (!templates) {
   templates = [
-    { text: "Эй, Иляха!", say: "эй, Иляха", icon: "📣" },
-    { text: "Иляха, пить идешь?", say: "Иляха, пить идешь?", icon: "🥤" },
-    { text: "Давай дааай!", say: "давай дааай", icon: "🤲" },
-    { text: "Ура, пятница!", say: "ура, пятница!", icon: "📅" },
-    { text: "Я играю в GTA", say: "я играю в гэ тэ а", icon: "🚗" },
-    { text: "Где мои очки?", say: "где мои очки", icon: "👓" },
     { text: "Я хочу купить 2 булки", say: "я хочу купить две булки", icon: "🥐" },
     { text: "Сколько это стоит?", say: "сколько это стоит", icon: "💰" },
     { text: "Где это находится?", say: "где это находится", icon: "🗺️" },
     { text: "Мне нужен пакет", say: "мне нужен пакет", icon: "🛍️" },
     { text: "Можно оплатить картой?", say: "можно оплатить картой", icon: "💳" },
     { text: "Дайте пожалуйста чек", say: "дайте пожалуйста чек", icon: "🧾" },
-    { text: "Спасибо, до свидания", say: "спасибо, до свидания", icon: "👋" },
+    { text: "Эй, Иляха!", say: "эй, Иляха", icon: "📣" },
+    { text: "Иляха, пить идешь?", say: "Иляха, пить идешь?", icon: "🥤" },
+    { text: "Давай дааай!", say: "давай дааай", icon: "🤲" },
+    { text: "Ура, пятница!", say: "ура, пятница!", icon: "📅" },
+    { text: "Я играю в GTA", say: "я играю в гэ тэ а", icon: "🚗" },
+    { text: "Где мои очки?", say: "где мои очки", icon: "👓" },
     { text: "Хочу пить", say: "хочу пить", icon: "🥤" },
     { text: "Хочу есть", say: "хочу есть", icon: "🍽️" },
     { text: "Дайте пожалуйста воды", say: "дайте пожалуйста воды", icon: "💧" },
@@ -406,6 +338,7 @@ if (!templates) {
     { text: "Позовите Иляху", say: "позовите Иляху", icon: "🧑" },
     { text: "Хочу поговорить", say: "хочу поговорить", icon: "🗣️" },
     { text: "Обними меня", say: "обними меня", icon: "🤗" },
+    { text: "Оставь меня одного", say: "оставь меня одного", icon: "🚪" },
     { text: "Пойдем гулять", say: "пойдем гулять", icon: "🌳" },
     { text: "Хочу домой", say: "хочу домой", icon: "🏠" },
     { text: "Включи телевизор", say: "включи телевизор", icon: "📺" }
@@ -413,7 +346,7 @@ if (!templates) {
 }
 function saveTemplates() { localStorage.setItem('aac_templates', JSON.stringify(templates)); }
 
-// --- 3. ГОЛОСА ---
+// --- 3. ОЗВУЧКА (ГОЛОСА) ---
 let voices = [];
 let selectedVoice = null;
 
@@ -455,10 +388,17 @@ function speak(text) {
   }
 }
 
-// --- 4. ЛОГИКА ---
+// --- 4. ОСНОВНАЯ ЛОГИКА (СЕТКА) ---
 let phrase = [];
 let activeCat = 'needs';
 let isLarge = false;
+let customWords = JSON.parse(localStorage.getItem('aac_custom_words')) || [];
+
+function loadCustomWords() {
+  customWords.forEach(w => {
+    if (!items.find(i => i.l === w.l)) items.push(w);
+  });
+}
 
 function render() {
   document.getElementById('tabs').innerHTML = Object.keys(catNames).map(key => 
@@ -493,6 +433,7 @@ function addItem(label) {
   const item = items.find(i => i.l === label);
   if (!item) return;
   
+  // Статистика
   let stats = JSON.parse(localStorage.getItem('aac_stats')) || {};
   stats[item.l] = (stats[item.l] || 0) + 1;
   localStorage.setItem('aac_stats', JSON.stringify(stats));
@@ -500,6 +441,7 @@ function addItem(label) {
   phrase.push(item);
   updateStrip();
   
+  // Умные предложения
   if (item.l === 'Пить' || item.l === 'Еда' || item.l === 'Спать' || item.l === 'Туалет') {
     speak("Я хочу " + item.s);
   } else {
@@ -552,11 +494,24 @@ function removeItem(idx) {
   updateStrip();
 }
 
+// --- 5. МЕНЮ С ТРЕМЯ ТОЧКАМИ ---
+document.getElementById('moreBtn').onclick = (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('moreMenu');
+  menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+};
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('moreMenu');
+  const btn = document.getElementById('moreBtn');
+  if (menu && !menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
+});
+
+// --- 6. ГОТОВЫЕ ФРАЗЫ (ЛОГИКА) ---
 function renderPhrases() {
   const list = document.getElementById('phrasesList');
   list.innerHTML = templates.map((p, idx) => `
     <div style="display: flex; gap: 8px; align-items: center;">
-      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
         <span style="font-size: 24px;">${p.icon}</span> <span style="line-height: 1.2;">${p.text}</span>
       </button>
       <button onclick="deleteTemplate(${idx})" style="padding: 12px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
@@ -598,6 +553,25 @@ document.getElementById('phrasesBtn').onclick = () => {
   document.getElementById('phrasesModal').classList.add('active');
 };
 
+// --- 7. БЫСТРЫЙ ДОСТУП ---
+const quickWords = ['Вода', 'Туалет', 'Мама', 'Помощь', 'Иляха'];
+function renderQuickAccess() {
+  const container = document.getElementById('quickAccess');
+  container.innerHTML = '';
+  quickWords.forEach(wordLabel => {
+    const it = items.find(i => i.l === wordLabel);
+    if (!it) return;
+    const div = document.createElement('div');
+    div.className = 'suggest-card';
+    div.style.background = '#fff'; 
+    div.style.borderColor = 'var(--text)';
+    div.innerHTML = `${it.e} <span style="color:var(--text)">${it.l}</span>`;
+    div.onclick = () => addItem(it.l);
+    container.appendChild(div);
+  });
+}
+
+// --- 8. СТАТИСТИКА ---
 function showStats() {
   const stats = JSON.parse(localStorage.getItem('aac_stats')) || {};
   const sorted = Object.entries(stats).sort((a, b) => b[1] - a[1]);
@@ -625,129 +599,7 @@ function showStats() {
   document.body.appendChild(modal);
 }
 
-// --- 5. ИГРА ФЛАГИ С ОЗВУЧКОЙ СТРАН ---
-const countryNames = {
-  ad:'Андорра', ae:'ОАЭ', af:'Афганистан', ag:'Антигуа и Барбуда', ai:'Ангилья', al:'Албания', am:'Армения', ao:'Ангола', aq:'Антарктида', ar:'Аргентина', as:'Американское Самоа', at:'Австрия', au:'Австралия', aw:'Аруба', ax:'Аландские о-ва', az:'Азербайджан', ba:'Босния и Герцеговина', bb:'Барбадос', bd:'Бангладеш', be:'Бельгия', bf:'Буркина-Фасо', bg:'Болгария', bh:'Бахрейн', bi:'Бурунди', bj:'Бенин', bl:'Сен-Бартелеми', bm:'Бермудские о-ва', bn:'Бруней', bo:'Боливия', bq:'Бонайре', br:'Бразилия', bs:'Багамы', bt:'Бутан', bw:'Ботсвана', by:'Беларусь', bz:'Белиз', ca:'Канада', cc:'Кокосовые о-ва', cd:'Конго', cf:'ЦАР', cg:'Конго', ch:'Швейцария', ci:'Кот-д’Ивуар', ck:'Острова Кука', cl:'Чили', cm:'Камерун', cn:'Китай', co:'Колумбия', cr:'Коста-Рика', cu:'Куба', cv:'Кабо-Верде', cw:'Кюрасао', cx:'о-в Рождества', cy:'Кипр', cz:'Чехия', de:'Германия', dj:'Джибути', dk:'Дания', dm:'Доминика', do:'Доминикана', dz:'Алжир', ec:'Эквадор', ee:'Эстония', eg:'Египет', eh:'Западная Сахара', er:'Эритрея', es:'Испания', et:'Эфиопия', fi:'Финляндия', fj:'Фиджи', fk:'Фолклендские о-ва', fm:'Микронезия', fo:'Фарерские о-ва', fr:'Франция', ga:'Габон', gb:'Великобритания', gd:'Гренада', ge:'Грузия', gf:'Французская Гвиана', gg:'Гернси', gh:'Гана', gi:'Гибралтар', gl:'Гренландия', gm:'Гамбия', gn:'Гвинея', gp:'Гваделупа', gq:'Экваториальная Гвинея', gr:'Греция', gs:'Южная Георгия', gt:'Гватемала', gu:'Гуам', gw:'Гвинея-Бисау', gy:'Гайана', hk:'Гонконг', hm:'о-в Херд', hn:'Гондурас', hr:'Хорватия', ht:'Гаити', hu:'Венгрия', id:'Индонезия', ie:'Ирландия', il:'Израиль', im:'о-в Мэн', in:'Индия', io:'Британская территория', iq:'Ирак', ir:'Иран', is:'Исландия', it:'Италия', je:'Джерси', jm:'Ямайка', jo:'Иордания', jp:'Япония', ke:'Кения', kg:'Киргизия', kh:'Камбоджа', ki:'Кирибати', km:'Коморы', kn:'Сент-Китс и Невис', kp:'КНДР', kr:'Южная Корея', kw:'Кувейт', ky:'Каймановы о-ва', kz:'Казахстан', la:'Лаос', lb:'Ливан', lc:'Сент-Люсия', li:'Лихтенштейн', lk:'Шри-Ланка', lr:'Либерия', ls:'Лесото', lt:'Литва', lu:'Люксембург', lv:'Латвия', ly:'Ливия', ma:'Марокко', mc:'Монако', md:'Молдова', me:'Черногория', mf:'Сен-Мартен', mg:'Мадагаскар', mh:'Маршалловы О-ва', mk:'Северная Македония', ml:'Мали', mm:'Мьянма', mn:'Монголия', mo:'Макао', mp:'Северные Марианские о-ва', mq:'Мартиника', mr:'Мавритания', ms:'Монтсеррат', mt:'Мальта', mu:'Маврикий', mv:'Мальдивы', mw:'Малави', mx:'Мексика', my:'Малайзия', mz:'Мозамбик', na:'Намибия', nc:'Новая Каледония', ne:'Нигер', nf:'о-в Норфолк', ng:'Нигерия', ni:'Никарагуа', nl:'Нидерланды', no:'Норвегия', np:'Непал', nr:'Науру', nu:'Ниуэ', nz:'Новая Зеландия', om:'Оман', pa:'Панама', pe:'Перу', pf:'Французская Полинезия', pg:'Папуа — Новая Гвинея', ph:'Филиппины', pk:'Пакистан', pl:'Польша', pm:'Сен-Пьер и Микелон', pn:'о-ва Питкэрн', pr:'Пуэрто-Рико', ps:'Палестина', pt:'Португалия', pw:'Палау', py:'Парагвай', qa:'Катар', re:'Реюньон', ro:'Румыния', rs:'Сербия', ru:'Россия', rw:'Руанда', sa:'Саудовская Аравия', sb:'Соломоновы О-ва', sc:'Сейшельские О-ва', sd:'Судан', se:'Швеция', sg:'Сингапур', sh:'о-в Св. Елены', si:'Словения', sj:'Шпицберген', sk:'Словакия', sl:'Сьерра-Леоне', sm:'Сан-Марино', sn:'Сенегал', so:'Сомали', sr:'Суринам', ss:'Южный Судан', st:'Сан-Томе и Принсипи', sv:'Сальвадор', sx:'Синт-Мартен', sy:'Сирия', sz:'Эсватини', tc:'Тёркс и Кайкос', td:'Чад', tf:'Французские Южные территории', tg:'Того', th:'Таиланд', tj:'Таджикистан', tk:'Токелау', tl:'Восточный Тимор', tm:'Туркменистан', tn:'Тунис', to:'Тонга', tr:'Турция', tt:'Тринидад и Тобаго', tv:'Тувалу', tw:'Тайвань', tz:'Танзания', ua:'Украина', ug:'Уганда', um:'Внешние малые о-ва', us:'США', uy:'Уругвай', uz:'Узбекистан', va:'Ватикан', vc:'Сент-Винсент', ve:'Венесуэла', vg:'Британские Виргинские о-ва', vi:'Виргинские о-ва', vn:'Вьетнам', vu:'Вануату', wf:'Уоллис и Футуна', ws:'Самоа', ye:'Йемен', yt:'Майотта', za:'ЮАР', zm:'Замбия', zw:'Зимбабве'
-};
-const allFlags = Object.keys(countryNames);
-
-let gameCards = [], flippedCards = [], matchedPairs = 0, lockBoard = false, currentGameSize = 4;
-
-function startGame(size) {
-  currentGameSize = size;
-  const pairsCount = size === 4 ? 8 : 10;
-  const selectedFlags = [...allFlags].sort(() => 0.5 - Math.random()).slice(0, pairsCount);
-  gameCards = [...selectedFlags, ...selectedFlags].sort(() => 0.5 - Math.random());
-  flippedCards = [];
-  matchedPairs = 0;
-  lockBoard = false;
-  
-  const grid = document.getElementById('gameGrid');
-  grid.className = `game-grid cols-${size}`;
-  grid.innerHTML = gameCards.map((code, index) => `
-    <div class="game-card" id="card-${index}" onclick="flipCard(${index})">
-      <img src="https://flagcdn.com/w160/${code}.png" style="width: 80%; height: auto; opacity: 0; transition: opacity 0.2s; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" class="flag-img">
-    </div>
-  `).join('');
-  document.getElementById('gameStatus').innerText = 'Найди все пары!';
-}
-
-function flipCard(index) {
-  if (lockBoard) return;
-  const card = document.getElementById(`card-${index}`);
-  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
-  
-  // ОЗВУЧКА СТРАНЫ
-  const countryCode = gameCards[index];
-  const countryName = countryNames[countryCode] || "Страна";
-  speak(countryName);
-
-  card.classList.add('flipped');
-  card.style.background = 'rgba(255,255,255,0.2)';
-  card.style.borderColor = 'var(--primary)';
-  card.querySelector('img').style.opacity = '1';
-  flippedCards.push({ index, element: card, code: gameCards[index] });
-  
-  if (flippedCards.length === 2) {
-    lockBoard = true;
-    const card1 = flippedCards[0];
-    const card2 = flippedCards[1];
-    
-    if (card1.code === card2.code) {
-      card1.element.classList.add('matched'); card2.element.classList.add('matched');
-      card1.element.style.background = 'rgba(34, 197, 94, 0.4)'; card2.element.style.background = 'rgba(34, 197, 94, 0.4)';
-      card1.element.style.borderColor = '#22c55e'; card2.element.style.borderColor = '#22c55e';
-      matchedPairs++; flippedCards = []; lockBoard = false;
-      
-      if (matchedPairs === (currentGameSize === 4 ? 8 : 10)) {
-        document.getElementById('gameStatus').innerText = '🎉 Победа! Молодец!';
-        speak('Молодец! Ты нашел все флаги!');
-      }
-    } else {
-      setTimeout(() => {
-        card1.element.classList.remove('flipped'); card2.element.classList.remove('flipped');
-        card1.element.style.background = 'rgba(0,0,0,0.3)'; card2.element.style.background = 'rgba(0,0,0,0.3)';
-        card1.element.style.borderColor = 'var(--border)'; card2.element.style.borderColor = 'var(--border)';
-        card1.element.querySelector('img').style.opacity = '0'; card2.element.querySelector('img').style.opacity = '0';
-        flippedCards = []; lockBoard = false;
-      }, 1500);
-    }
-  }
-}
-
-document.getElementById('gameBtn').onclick = () => { startGame(4); document.getElementById('gameModal').classList.add('active'); };
-
-// --- 6. ИГРА КАРТИНКИ ---
-let quizTargetItem = null;
-function startQuiz() {
-  const availableItems = items.filter(i => i.e);
-  quizTargetItem = availableItems[Math.floor(Math.random() * availableItems.length)];
-  let wrongOptions = availableItems.filter(i => i.l !== quizTargetItem.l).sort(() => 0.5 - Math.random()).slice(0, 3);
-  let options = [quizTargetItem, ...wrongOptions].sort(() => 0.5 - Math.random());
-  
-  document.getElementById('quizTarget').innerText = quizTargetItem.l;
-  document.getElementById('quizStatus').innerText = '';
-  
-  const optionsContainer = document.getElementById('quizOptions');
-  optionsContainer.innerHTML = options.map(opt => `
-    <div class="quiz-option" onclick="checkQuizAnswer('${opt.l}', this)">${opt.e}</div>
-  `).join('');
-  speak(`Найди ${quizTargetItem.l}`);
-}
-
-function checkQuizAnswer(selectedLabel, element) {
-  if (selectedLabel === quizTargetItem.l) {
-    element.style.background = 'rgba(34, 197, 94, 0.4)'; element.style.borderColor = '#22c55e';
-    document.getElementById('quizStatus').innerText = '🎉 Правильно!';
-    document.getElementById('quizStatus').style.color = '#059669';
-    speak('Молодец! Правильно!');
-    setTimeout(() => { startQuiz(); }, 2000);
-  } else {
-    element.style.background = 'rgba(239, 68, 68, 0.4)'; element.style.borderColor = '#dc2626';
-    document.getElementById('quizStatus').innerText = '❌ Попробуй еще раз';
-    document.getElementById('quizStatus').style.color = '#dc2626';
-    setTimeout(() => { element.style.background = 'rgba(0,0,0,0.2)'; element.style.borderColor = 'var(--border)'; }, 1000);
-  }
-}
-document.getElementById('quizBtn').onclick = () => { startQuiz(); document.getElementById('quizModal').classList.add('active'); };
-
-// --- 7. БЫСТРЫЙ ДОСТУП ---
-const quickWords = ['Вода', 'Туалет', 'Пить', 'Еда', 'Помощь', 'Мама', 'Иляха', 'Да', 'Нет', 'Устал'];
-function renderQuickAccess() {
-  const container = document.getElementById('quickAccess');
-  container.innerHTML = '';
-  quickWords.forEach(wordLabel => {
-    const it = items.find(i => i.l === wordLabel);
-    if (!it) return;
-    const div = document.createElement('div');
-    div.className = 'suggest-card';
-    div.innerHTML = `${it.e} <span>${it.l}</span>`;
-    div.onclick = () => addItem(it.l);
-    container.appendChild(div);
-  });
-}
-
-// --- 8. МОЙ ДЕНЬ ---
+// --- 9. ОКНО "МОЙ ДЕНЬ" ---
 const dayActivities = [
   { text: "Я играю в GTA", say: "я играю в гэ тэ а", icon: "🚗" },
   { text: "Играл в PlayStation", say: "я играл в плейстейшен", icon: "🎮" },
@@ -757,27 +609,411 @@ const dayActivities = [
 ];
 
 document.getElementById('dayBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
   speak("Чем ты сегодня занимался?");
   const container = document.getElementById('dayOptions');
+  
   container.innerHTML = dayActivities.map((a, index) => `
-    <button id="day-btn-${index}" onclick="selectDayActivity(${index}, '${a.say}')" style="padding:14px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.05); color:var(--text); font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; cursor:pointer; transition: 0.2s;">
+    <button id="day-btn-${index}" onclick="selectDayActivity(${index}, '${a.say}')" style="padding:14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-weight:600; font-size:15px; display:flex; align-items:center; gap:10px; cursor:pointer; transition: 0.2s;">
       <span style="font-size:24px;">${a.icon}</span> ${a.text}
     </button>
-  `).join('') + `<button id="confirmDayBtn" style="display:none; margin-top:10px; padding:14px; border-radius:10px; border:none; background:#059669; color:#fff; font-weight:800; font-size:16px; cursor:pointer;">✅ Подтвердить</button>`;
+  `).join('') + `
+    <button id="confirmDayBtn" style="display:none; margin-top:10px; padding:14px; border-radius:10px; border:none; background:#059669; color:#fff; font-weight:800; font-size:16px; cursor:pointer;">✅ Подтвердить</button>
+  `;
+  
   document.getElementById('dayModal').classList.add('active');
 };
 
 function selectDayActivity(index, sayText) {
-  document.querySelectorAll('[id^="day-btn-"]').forEach(btn => { btn.style.background = 'rgba(255,255,255,0.05)'; btn.style.borderColor = 'var(--border)'; });
+  document.querySelectorAll('[id^="day-btn-"]').forEach(btn => {
+    btn.style.background = 'var(--surface)';
+    btn.style.borderColor = 'var(--border)';
+  });
+  
   const selectedBtn = document.getElementById(`day-btn-${index}`);
-  selectedBtn.style.background = 'rgba(34, 197, 94, 0.4)'; selectedBtn.style.borderColor = '#22c55e';
+  selectedBtn.style.background = '#dcfce7';
+  selectedBtn.style.borderColor = '#22c55e';
   speak(sayText);
+  
   const confirmBtn = document.getElementById('confirmDayBtn');
   confirmBtn.style.display = 'block';
-  confirmBtn.onclick = () => { document.getElementById('dayModal').classList.remove('active'); speak("Отлично! Запомнил."); };
+  confirmBtn.onclick = () => {
+    document.getElementById('dayModal').classList.remove('active');
+    speak("Отлично! Запомнил.");
+  };
 }
 
-// --- 9. МИКРОФОН ---
+// --- 10. СНАЧАЛА - ПОТОМ ---
+document.getElementById('firstThenBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  document.getElementById('firstThenModal').classList.add('active');
+  
+  const fSelect = document.getElementById('firstSelect');
+  const tSelect = document.getElementById('thenSelect');
+  
+  fSelect.innerHTML = '<option value="">-- Выберите --</option>';
+  tSelect.innerHTML = '<option value="">-- Выберите --</option>';
+  
+  items.forEach(it => {
+    if (!it.e) return;
+    const opt1 = document.createElement('option');
+    opt1.value = it.e + '|' + it.l + '|' + it.s;
+    opt1.textContent = it.e + ' ' + it.l;
+    fSelect.appendChild(opt1);
+    
+    const opt2 = document.createElement('option');
+    opt2.value = it.e + '|' + it.l + '|' + it.s;
+    opt2.textContent = it.e + ' ' + it.l;
+    tSelect.appendChild(opt2);
+  });
+
+  fSelect.onchange = updateFirstThenDisplay;
+  tSelect.onchange = updateFirstThenDisplay;
+};
+
+function updateFirstThenDisplay() {
+  const fVal = document.getElementById('firstSelect').value;
+  const tVal = document.getElementById('thenSelect').value;
+  
+  if (fVal) document.getElementById('firstDisplay').innerText = fVal.split('|')[0];
+  else document.getElementById('firstDisplay').innerText = '❓';
+  
+  if (tVal) document.getElementById('thenDisplay').innerText = tVal.split('|')[0];
+  else document.getElementById('thenDisplay').innerText = '❓';
+}
+
+function speakFirstThen() {
+  const fVal = document.getElementById('firstSelect').value;
+  const tVal = document.getElementById('thenSelect').value;
+  
+  if (!fVal || !tVal) {
+    speak("Выберите оба действия");
+    return;
+  }
+  
+  const firstSay = fVal.split('|')[2];
+  const thenSay = tVal.split('|')[2];
+  speak(`Сначала ${firstSay}, потом ${thenSay}`);
+}
+
+// --- 11. ЧТЕНИЕ ТЕКСТА ---
+document.getElementById('readClipboardBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  document.getElementById('clipboardText').value = '';
+  document.getElementById('readClipboardModal').classList.add('active');
+  
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    navigator.clipboard.readText().then(text => {
+      if (text && text.trim() !== '') {
+        document.getElementById('clipboardText').value = text;
+        speak(text);
+      }
+    }).catch(err => console.log('Нет доступа:', err));
+  }
+};
+
+document.getElementById('pasteAutoBtn').onclick = async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text && text.trim() !== '') {
+      document.getElementById('clipboardText').value = text;
+      speak("Текст вставлен. Нажмите Прочитать.");
+    } else {
+      speak("Буфер обмена пуст");
+    }
+  } catch (err) {
+    speak("Не удалось прочитать буфер. Вставьте вручную.");
+  }
+};
+
+document.getElementById('readAgainBtn').onclick = () => {
+  const text = document.getElementById('clipboardText').value;
+  if (text && text.trim() !== '') speak(text);
+  else speak("Нет текста для чтения");
+};
+
+// --- 12. ОБО МНЕ ---
+let aboutMeData = JSON.parse(localStorage.getItem('aac_about_me')) || null;
+
+function saveAboutMe() {
+  const name = document.getElementById('setupName').value;
+  const phone = document.getElementById('setupPhone').value;
+  const address = document.getElementById('setupAddress').value;
+  
+  aboutMeData = { name, phone, address };
+  localStorage.setItem('aac_about_me', JSON.stringify(aboutMeData));
+  
+  document.getElementById('setupAboutModal').classList.remove('active');
+  speak("Данные сохранены");
+  alert("Данные сохранены на этом телефоне!");
+}
+
+document.getElementById('aboutMeBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  if (!aboutMeData || !aboutMeData.name) {
+    alert("Сначала настройте данные в Настройках (⚙️)!");
+    return;
+  }
+  
+  const content = document.getElementById('aboutMeContent');
+  content.innerHTML = `
+    Меня зовут <b>${aboutMeData.name}</b>.<br><br>
+    У меня трудности с речью.<br><br>
+    Пожалуйста, помогите мне.<br><br>
+    Телефон: <b>${aboutMeData.phone}</b><br>
+    ${aboutMeData.address ? 'Адрес: ' + aboutMeData.address : ''}
+  `;
+  
+  document.getElementById('aboutMeModal').classList.add('active');
+  speakAboutMe();
+};
+
+function speakAboutMe() {
+  if (!aboutMeData) return;
+  const text = `Меня зовут ${aboutMeData.name}. У меня трудности с речью. Пожалуйста, помогите мне. Позвоните по номеру: ${aboutMeData.phone}.`;
+  speak(text);
+}
+
+// --- 13. КРЕСТИКИ-НОЛИКИ ---
+let tttBoard = ['', '', '', '', '', '', '', '', ''];
+let tttCurrentPlayer = '❌';
+let tttGameActive = true;
+let scoreX = 0, scoreO = 0;
+
+const tttWinConditions = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6]
+];
+
+function initTTT() {
+  tttBoard = ['', '', '', '', '', '', '', '', ''];
+  tttCurrentPlayer = '❌';
+  tttGameActive = true;
+  document.getElementById('ttt-status').innerText = 'Ходят крестики (❌)';
+  renderTTT();
+}
+
+function renderTTT() {
+  const boardEl = document.getElementById('ttt-board');
+  boardEl.innerHTML = tttBoard.map((cell, index) => `
+    <div onclick="makeMove(${index})" style="aspect-ratio: 1/1; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; transition: 0.2s;">
+      ${cell}
+    </div>
+  `).join('');
+}
+
+function makeMove(index) {
+  if (tttBoard[index] !== '' || !tttGameActive) return;
+  tttBoard[index] = tttCurrentPlayer;
+  speak(tttCurrentPlayer);
+  checkTTTWinner();
+  renderTTT();
+}
+
+function checkTTTWinner() {
+  let roundWon = false;
+  let winPattern = [];
+  
+  for (let i = 0; i < tttWinConditions.length; i++) {
+    const [a, b, c] = tttWinConditions[i];
+    if (tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c]) {
+      roundWon = true;
+      winPattern = [a, b, c];
+      break;
+    }
+  }
+
+  if (roundWon) {
+    document.getElementById('ttt-status').innerText = `Победили ${tttCurrentPlayer}! 🎉`;
+    speak(`Победили ${tttCurrentPlayer}`);
+    tttGameActive = false;
+    
+    if (tttCurrentPlayer === '❌') { scoreX++; document.getElementById('score-x').innerText = scoreX; }
+    else { scoreO++; document.getElementById('score-o').innerText = scoreO; }
+
+    winPattern.forEach(index => {
+      const cell = document.getElementById('ttt-board').children[index];
+      cell.style.background = '#dcfce7';
+      cell.style.borderColor = '#22c55e';
+    });
+
+    if (scoreX >= 3 || scoreO >= 3) {
+      let matchWinner = scoreX >= 3 ? 'Крестики' : 'Нолики';
+      setTimeout(() => {
+        document.getElementById('ttt-status').innerText = `🏆 МАТЧ ВЫИГРАЛИ ${matchWinner}! 🏆`;
+        speak(`Матч выиграли ${matchWinner}!`);
+        launchConfetti();
+        setTimeout(() => {
+          scoreX = 0; scoreO = 0;
+          document.getElementById('score-x').innerText = 0;
+          document.getElementById('score-o').innerText = 0;
+          initTTT();
+        }, 5000);
+      }, 1000);
+    }
+    return;
+  }
+
+  if (!tttBoard.includes('')) {
+    document.getElementById('ttt-status').innerText = 'Ничья! 🤝 Супер раунд!';
+    speak('Ничья. Супер раунд!');
+    tttGameActive = false;
+    setTimeout(() => {
+      tttBoard = ['', '', '', '', '', '', '', '', ''];
+      tttCurrentPlayer = '❌';
+      tttGameActive = true;
+      document.getElementById('ttt-status').innerText = 'Супер раунд! Ходят крестики (❌)';
+      renderTTT();
+    }, 2000);
+    return;
+  }
+
+  tttCurrentPlayer = tttCurrentPlayer === '❌' ? '⭕' : '❌';
+  document.getElementById('ttt-status').innerText = `Ходят ${tttCurrentPlayer === '❌' ? 'крестики' : 'нолики'} (${tttCurrentPlayer})`;
+}
+
+function resetTTT() { initTTT(); speak('Новая игра'); }
+
+document.getElementById('tictactoeBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  initTTT();
+  document.getElementById('tictactoeModal').classList.add('active');
+  speak('Крестики нолики');
+};
+
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+  const particles = [];
+  const colors = ['#f59e0b', '#ef4444', '#3b82f6', '#22c55e', '#ec4899'];
+  for (let i = 0; i < 100; i++) {
+    particles.push({ x: window.innerWidth / 2, y: window.innerHeight / 2, vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20, size: Math.random() * 8 + 4, color: colors[Math.floor(Math.random() * colors.length)], life: 100 });
+  }
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let active = false;
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 1;
+      if (p.life > 0) {
+        active = true; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+    if (active) requestAnimationFrame(update);
+    else canvas.style.display = 'none';
+  }
+  update();
+}
+
+// --- 14. ИГРА ФЛАГИ ---
+const allFlags = ['🇷🇺', '🇪🇪', '🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇨🇳', '🇮🇹', '🇪🇸', '🇨🇦', '🇧🇷', '🇦🇺', '🇮🇳', '🇰🇷', '🇲🇽', '🇿🇦', '🇦🇷', '🇹🇷', '🇸🇪', '🇳🇴', '🇩🇰', '🇫🇮', '🇵🇱', '🇺🇦', '🇰🇿', '🇬🇪', '🇦🇲', '🇱🇻', '🇱🇹', '🇮🇱', '🇸🇦', '🇦🇪', '🇪🇬', '🇬🇷', '🇵🇹', '🇳🇱', '🇧🇪', '🇨🇭', '🇦🇹'];
+let gameCards = [], flippedCards = [], matchedPairs = 0, lockBoard = false, currentGameSize = 4;
+
+function startGame(size) {
+  currentGameSize = size;
+  const pairsCount = size === 4 ? 8 : 10;
+  const selectedFlags = [...allFlags].sort(() => 0.5 - Math.random()).slice(0, pairsCount);
+  gameCards = [...selectedFlags, ...selectedFlags].sort(() => 0.5 - Math.random());
+  flippedCards = []; matchedPairs = 0; lockBoard = false;
+  const grid = document.getElementById('gameGrid');
+  grid.className = `game-grid cols-${size}`;
+  grid.innerHTML = gameCards.map((flag, index) => `
+    <div class="game-card" id="card-${index}" onclick="flipCard(${index})"><span>${flag}</span></div>
+  `).join('');
+  document.getElementById('gameStatus').innerText = 'Найди все пары!';
+}
+
+function flipCard(index) {
+  if (lockBoard) return;
+  const card = document.getElementById(`card-${index}`);
+  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  card.classList.add('flipped');
+  card.style.background = 'var(--primary-light)'; card.style.borderColor = 'var(--primary)';
+  card.querySelector('span').style.opacity = '1';
+  flippedCards.push({ index, flag: gameCards[index], element: card });
+  
+  if (flippedCards.length === 2) {
+    lockBoard = true;
+    const c1 = flippedCards[0], c2 = flippedCards[1];
+    if (c1.flag === c2.flag) {
+      c1.element.classList.add('matched'); c2.element.classList.add('matched');
+      c1.element.style.background = '#dcfce7'; c2.element.style.background = '#dcfce7';
+      c1.element.style.borderColor = '#22c55e'; c2.element.style.borderColor = '#22c55e';
+      matchedPairs++; flippedCards = []; lockBoard = false;
+      if (matchedPairs === (currentGameSize === 4 ? 8 : 10)) {
+        document.getElementById('gameStatus').innerText = '🎉 Победа! Молодец!';
+        speak('Молодец! Ты нашел все флаги!');
+      }
+    } else {
+      setTimeout(() => {
+        c1.element.classList.remove('flipped'); c2.element.classList.remove('flipped');
+        c1.element.style.background = 'var(--bg)'; c2.element.style.background = 'var(--bg)';
+        c1.element.style.borderColor = 'var(--border)'; c2.element.style.borderColor = 'var(--border)';
+        c1.element.querySelector('span').style.opacity = '0'; c2.element.querySelector('span').style.opacity = '0';
+        flippedCards = []; lockBoard = false;
+      }, 1000);
+    }
+  }
+}
+
+document.getElementById('gameBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  startGame(4);
+  document.getElementById('gameModal').classList.add('active');
+};
+
+// --- 15. ИГРА НАЙДИ КАРТИНКУ ---
+let quizTargetItem = null;
+function startQuiz() {
+  const availableItems = items.filter(i => i.e);
+  quizTargetItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+  let wrongOptions = availableItems.filter(i => i.l !== quizTargetItem.l).sort(() => 0.5 - Math.random()).slice(0, 3);
+  let options = [quizTargetItem, ...wrongOptions].sort(() => 0.5 - Math.random());
+  document.getElementById('quizTarget').innerText = quizTargetItem.l;
+  document.getElementById('quizStatus').innerText = '';
+  document.getElementById('quizOptions').innerHTML = options.map(opt => `
+    <div class="quiz-option" onclick="checkQuizAnswer('${opt.l}', this)">${opt.e}</div>
+  `).join('');
+  speak(`Найди ${quizTargetItem.l}`);
+}
+function checkQuizAnswer(selectedLabel, element) {
+  if (selectedLabel === quizTargetItem.l) {
+    element.style.background = '#dcfce7'; element.style.borderColor = '#22c55e';
+    document.getElementById('quizStatus').innerText = '🎉 Правильно!'; document.getElementById('quizStatus').style.color = '#059669';
+    speak('Молодец! Правильно!'); setTimeout(() => { startQuiz(); }, 2000);
+  } else {
+    element.style.background = '#fee2e2'; element.style.borderColor = '#dc2626';
+    document.getElementById('quizStatus').innerText = '❌ Попробуй еще раз'; document.getElementById('quizStatus').style.color = '#dc2626';
+    setTimeout(() => { element.style.background = 'var(--bg)'; element.style.borderColor = 'var(--border)'; }, 1000);
+  }
+}
+document.getElementById('quizBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  startQuiz();
+  document.getElementById('quizModal').classList.add('active');
+};
+
+// --- 16. СОХРАНЕНИЕ СВОИХ СЛОВ ---
+function saveNewWord() {
+  const title = document.getElementById('newWordTitle').value.trim();
+  const emoji = document.getElementById('newWordEmoji').value.trim() || '📌';
+  const category = document.getElementById('newWordCategory').value;
+  if (!title) { alert("Введите название слова!"); return; }
+  const newWord = { c: category, e: emoji, l: title, s: title.toLowerCase(), next: [] };
+  customWords.push(newWord);
+  localStorage.setItem('aac_custom_words', JSON.stringify(customWords));
+  items.push(newWord);
+  document.getElementById('addWordModal').classList.remove('active');
+  document.getElementById('newWordTitle').value = '';
+  document.getElementById('newWordEmoji').value = '';
+  speak("Слово добавлено: " + title);
+  setCat(category);
+}
+
+// --- 17. ГОЛОСОВОЕ ДОБАВЛЕНИЕ ФРАЗ ---
 let recognition;
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -799,28 +1035,12 @@ document.getElementById('micBtn').onclick = () => {
   }
 };
 
-// --- 10. МЕНЮ И КНОПКИ ---
-document.getElementById('moreBtn').onclick = (e) => {
-  e.stopPropagation();
-  const menu = document.getElementById('moreMenu');
-  menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
-};
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('moreMenu');
-  const btn = document.getElementById('moreBtn');
-  if (menu && !menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
-});
-
-document.getElementById('themeBtn').onclick = () => {
-  document.body.classList.toggle('light-mode');
-  document.getElementById('themeBtn').innerText = document.body.classList.contains('light-mode') ? '🌙 Тёмная' : '☀️ Светлая';
-};
-
+// --- 18. КНОПКА ПОДЕЛИТЬСЯ ---
 document.getElementById('shareBtn').onclick = async () => {
   if (phrase.length === 0) { speak("Сначала выберите слова"); return; }
   const textToShare = phrase.map(p => `${p.e} ${p.s}`).join(' ');
   if (navigator.share) {
-    try { await navigator.share({ title: 'Сообщение от Максима', text: textToShare }); } catch (err) { console.log('Отмена', err); }
+    try { await navigator.share({ title: 'Сообщение', text: textToShare }); } catch (err) { console.log('Отмена', err); }
   } else {
     navigator.clipboard.writeText(textToShare);
     speak("Текст скопирован");
@@ -828,10 +1048,12 @@ document.getElementById('shareBtn').onclick = async () => {
   }
 };
 
+// --- 19. ОБРАБОТЧИКИ КНОПОК ---
 document.getElementById('speakBtn').onclick = () => { if (phrase.length) speak(phrase.map(p => p.s).join(' ')); };
 document.getElementById('backBtn').onclick = () => { if (phrase.length) { phrase.pop(); updateStrip(); } };
 document.getElementById('clearBtn').onclick = () => { phrase = []; updateStrip(); renderSuggestions([]); };
 document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('active');
+document.getElementById('themeBtn').onclick = () => { document.body.classList.toggle('dark'); document.getElementById('moreMenu').style.display = 'none'; };
 document.getElementById('statsBtn').onclick = showStats;
 document.getElementById('voiceSelect').onchange = (e) => { selectedVoice = voices.find(v => v.voiceURI === e.target.value); };
 document.getElementById('testVoiceBtn').onclick = () => speak('Проверка голоса');
@@ -841,12 +1063,38 @@ document.getElementById('sizeBtn').onclick = (e) => {
   document.getElementById('grid').classList.toggle('big', isLarge);
 };
 
-// --- 11. ЗАПУСК ---
+// --- 20. АВТООБНОВЛЕНИЕ ---
+async function checkForUpdates() {
+  try {
+    const response = await fetch('version.txt?t=' + new Date().getTime());
+    const serverVersion = await response.text();
+    const currentVersion = localStorage.getItem('app_version') || '0';
+    if (serverVersion.trim() !== currentVersion.trim()) {
+      localStorage.setItem('app_version', serverVersion.trim());
+      window.location.reload(true);
+    }
+  } catch (e) { console.log("Нет сети"); }
+}
+checkForUpdates();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkForUpdates(); });
+
+async function clearCacheAndReload() {
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (let reg of regs) { await reg.unregister(); }
+  }
+  const cacheNames = await caches.keys();
+  await Promise.all(cacheNames.map(name => caches.delete(name)));
+  window.location.reload(true);
+}
+
+// --- 21. ЗАПУСК ---
 if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
   setTimeout(loadVoices, 300);
 }
 
+loadCustomWords();
 render();
 renderQuickAccess();
 </script>
