@@ -93,13 +93,17 @@
 <div id="mainApp">
   <header>
     <h1>Коммуникатор</h1>
-    <div class="header-actions">
-      <button id="langBtn" class="btn-icon">RU</button>
+    <div class="header-actions" style="position: relative;">
       <button id="phrasesBtn" class="btn-icon">📋</button>
-      <button id="quizBtn" class="btn-icon">🧩</button>
-      <button id="gameBtn" class="btn-icon">🎮</button>
-      <button id="themeBtn" class="btn-icon">🌙</button>
       <button id="settingsBtn" class="btn-icon">⚙️</button>
+      <button id="moreBtn" class="btn-icon">⋯</button>
+
+      <div id="moreMenu" style="display: none; position: absolute; right: 0; top: 45px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; width: 160px;">
+        <button id="themeBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🌙 Тема</button>
+        <button id="dayBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">💬 Мой день</button>
+        <button id="quizBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🧩 Картинки</button>
+        <button id="gameBtn" class="btn-icon" style="text-align: left; width: 100%; display: block;">🎮 Флаги</button>
+      </div>
     </div>
   </header>
 
