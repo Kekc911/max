@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Коммуникатор</title>
+<style>
+  :root { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; --primary: #2563eb; --primary-light: #eff6ff; }
+  body.dark { --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; --primary: #3b82f6; --primary-light: #172554; }
+  * { box-sizing: border-box; margin: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+  body { background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s; }
+  
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+  .anim-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  .anim-slide { animation: slideUp 0.4s ease-out forwards; }
+
+  #welcomeScreen { position: fixed; inset: 0; background: var(--surface); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; transition: opacity 0.4s; }
+  #welcomeScreen.hide { opacity: 0; pointer-events: none; }
+  #welcomeScreen h1 { font-size: 28px; margin-bottom: 10px; font-weight: 800; }
+  #welcomeScreen p { font-size: 18px; color: var(--text-light); margin-bottom: 30px; font-weight: 500; }
+  .welcome-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 350px; }
+  .welcome-card { background: var(--bg); border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .welcome-card:active { transform: scale(0.95); }
+  .welcome-card .emoji { font-size: 50px; }
+  .welcome-card span { font-size: 16px; font-weight: 700; }
+
+  #mainApp { display: flex; flex-direction: column; height: 100dvh; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 10; }
+  header h1 { font-size: 16px; font-weight: 800; }
+  .header-actions { display: flex; gap: 6px; }
+  .btn-icon { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); }
+  
+  .strip-container { padding: 10px 14px 0; }
+  .strip { min-height: 50px; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+  .strip::-webkit-scrollbar { display: none; }
+  .chip { background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  
+  .actions { display: flex; gap: 8px; padding: 10px 14px; }
+  .actions button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; color: #fff; cursor: pointer; }
+  .btn-speak { background: #059669; } .btn-back { background: #d97706; } .btn-clear { background: #dc2626; }
+
+  .suggestions-container { padding: 0 14px 10px; }
+  .suggest-title { font-size: 11px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; }
+  .suggestions { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-height: 40px; align-items: center; }
+  .suggestions::-webkit-scrollbar { display: none; }
+  .suggest-card { background: var(--primary-light); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+  .suggest-card span { font-weight: 600; font-size: 13px; color: var(--primary); }
+
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; }
+  .tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; padding: 0 14px 14px; overflow-y: auto; align-content: start; }
+  .grid.big { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; aspect-ratio: 1/1; border-bottom: 3px solid var(--border); transition: transform 0.1s; }
+  .card:active { transform: scale(0.92); }
+  .card .emoji { font-size: 32px; line-height: 1; margin-bottom: 6px; }
+  .grid.big .card .emoji { font-size: 44px; }
+  .card span { font-weight: 600; font-size: 11px; text-align: center; line-height: 1.1; }
+  .grid.big .card span { font-size: 13px; }
+
+  .c-needs { border-bottom-color: #f59e0b; } .c-social { border-bottom-color: #ec4899; }
+  .c-actions { border-bottom-color: #10b981; } .c-people { border-bottom-color: #eab308; }
+  .c-food { border-bottom-color: #3b82f6; } .c-emotions { border-bottom-color: #8b5cf6; }
+  .c-places { border-bottom-color: #14b8a6; } .c-things { border-bottom-color: #64748b; }
+
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal.active { opacity: 1; pointer-events: auto; }
+  .modal-box { background: var(--surface); padding: 20px; border-radius: 12px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.2s; max-height: 85vh; overflow-y: auto; }
+  .modal.active .modal-box { transform: translateY(0); }
+  .modal-box label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
+  select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="welcomeScreen">
+  <h1 class="anim-slide">Привет, Максим!</h1>
+  <p class="anim-slide" style="animation-delay: 0.1s;">Как прошёл твой день?</p>
+  
+  <button onclick="startGreeting()" class="anim-pop" style="animation-delay: 0.2s; margin-bottom: 20px; padding: 15px 30px; font-size: 18px; font-weight: 800; color: #fff; background: #2563eb; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.3);">
+    🔊 Нажми, чтобы начать
+  </button>
+
+  <div class="welcome-grid">
+    <div class="welcome-card anim-pop" style="animation-delay: 0.3s;" onclick="selectMood('Отлично!', 'отлично')">
+      <div class="emoji">😃</div><span>Отлично</span>
+    </div>
+    <div class="welcome-card anim-pop" style="animation-delay: 0.4s;" onclick="selectMood('Хорошо', 'хорошо')">
+      <div class="emoji">😊</div><span>Хорошо</span>
+    </div>
+    <div class="welcome-card anim-pop" style="animation-delay: 0.5s;" onclick="selectMood('Нормально', 'нормально')">
+      <div class="emoji">😐</div><span>Нормально</span>
+    </div>
+    <div class="welcome-card anim-pop" style="animation-delay: 0.6s;" onclick="selectMood('Плохо', 'плохо')">
+      <div class="emoji">😢</div><span>Плохо</span>
+    </div>
+    <div class="welcome-card anim-pop" style="animation-delay: 0.7s; grid-column: span 2;" onclick="selectMood('Я устал', 'я устал')">
+      <div class="emoji">🥱</div><span>Устал</span>
+    </div>
+  </div>
+</div>
+
+<div id="mainApp">
+  <header>
+    <h1>Коммуникатор</h1>
+    <div class="header-actions">
+      <button id="langBtn" class="btn-icon">RU</button>
+      <button id="phrasesBtn" class="btn-icon">📋</button>
+      <button id="themeBtn" class="btn-icon">🌙</button>
+      <button id="settingsBtn" class="btn-icon">⚙️</button>
+    </div>
+  </header>
+
+  <div class="strip-container">
+    <div class="strip" id="strip"><span style="color:var(--text-light); font-weight:500; font-size:13px;">Нажимайте на карточки...</span></div>
+  </div>
+
+  <div class="actions">
+    <button id="speakBtn" class="btn-speak">Сказать</button>
+    <button id="backBtn" class="btn-back">Стереть</button>
+    <button id="clearBtn" class="btn-clear">Сброс</button>
+  </div>
+
+  <div class="suggestions-container" id="suggestionsContainer">
+    <div class="suggest-title" id="suggestTitle" style="display:none;">Далее:</div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div id="phrasesModal" class="modal">
+  <div class="modal-box">
+    <h2 style="text-align:center; font-size:18px; margin-bottom: 10px;">Готовые фразы</h2>
+    <div id="phrasesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    <button onclick="document.getElementById('phrasesModal').classList.remove('active')" style="margin-top: 10px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal">
+  <div class="modal-box">
+    <h2 style="text-align:center; font-size:16px;">Настройки</h2>
+    <label>Голос</label>
+    <select id="voiceSelect"><option>Загрузка...</option></select>
+    <label>Скорость <input type="range" id="rate" min="0.5" max="1.8" step="0.1" value="1" style="width:100px;"></label>
+    <label>Тон <input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="0.7" style="width:100px;"></label>
+    <label>Крупный шрифт <button id="sizeBtn" class="btn-icon">Выкл</button></label>
+    <button id="testVoiceBtn" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔊 Проверить</button>
+    <button onclick="document.getElementById('settingsModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button>
+  </div>
+</div>
+
+<script>
+
+  // --- ЛОГИКА ПРИВЕТСТВИЯ ---
+function startGreeting() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance("Привет, Максим! Как прошел твой день?");
+    u.lang = 'ru-RU';
+    u.rate = 1;
+    u.pitch = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function selectMood(text, say) {
+  speak(say);
+  logActivity('Настроение: ' + text);
+  
+  setTimeout(() => {
+    const welcome = document.getElementById('welcomeScreen');
+    welcome.classList.add('hide');
+    setTimeout(() => { welcome.style.display = 'none'; }, 400);
+  }, 1500);
+}
+
+// --- СТАТИСТИКА ---
+let activityStats = JSON.parse(localStorage.getItem('aac_stats')) || {};
+function logActivity(word) {
+  if (activityStats[word]) activityStats[word]++;
+  else activityStats[word] = 1;
+  localStorage.setItem('aac_stats', JSON.stringify(activityStats));
+}
+
+function showStats() {
+  const sorted = Object.entries(activityStats).sort((a, b) => b[1] - a[1]);
+  let statsHtml = '<h3 style="margin-bottom:10px;">Топ слов:</h3>';
+  
+  if (sorted.length === 0) {
+    statsHtml += '<p>Пока нет данных.</p>';
+  } else {
+    statsHtml += '<ul style="list-style: none; padding: 0;">';
+    sorted.slice(0, 10).forEach(([word, count]) => {
+      statsHtml += `<li style="padding: 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>${word}</span> <b>${count} раз</b></li>`;
+    });
+    statsHtml += '</ul>';
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Статистика</h2>
+      <div>${statsHtml}</div>
+      <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+// --- СЛОВА (110 штук, включая новые) ---
+const items = [
+  // Потребности (14)
+  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',t:{en:'I want'}, next:['Пить','Еда','Спать']},
+  {c:'needs',e:'🥤',l:'Пить',s:'пить',t:{en:'drink'}, next:['Вода','Пиво','Квас']},
+  {c:'needs',e:'🍽️',l:'Еда',s:'есть',t:{en:'eat'}, next:['Суши','Чипсики']},
+  {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',t:{en:'toilet'}, next:['Помощь']},
+  {c:'needs',e:'🛏️',l:'Спать',s:'спать',t:{en:'sleep'}, next:['Помощь']},
+  {c:'needs',e:'🆘',l:'Помощь',s:'помогите',t:{en:'help me'}, next:['Мама','Папа','Братик']},
+  {c:'needs',e:'🤕',l:'Больно',s:'мне больно',t:{en:'it hurts'}, next:['Помощь']},
+  {c:'needs',e:'🤲',l:'Дать',s:'дайте',t:{en:'give'}, next:['Вода','Телефон']},
+  {c:'needs',e:'☝️',l:'Надо',s:'мне надо',t:{en:'I need'}, next:['Вода','Помощь']},
+  {c:'needs',e:'🛋️',l:'Отдых',s:'отдохнуть',t:{en:'rest'}, next:['Дом']},
+  {c:'needs',e:'🚑',l:'Врача',s:'вызовите врача',t:{en:'call a doctor'}, next:[]},
+  {c:'needs',e:'📱',l:'Телефон',s:'телефон',t:{en:'phone'}, next:[]},
+  {c:'needs',e:'💧',l:'Воды',s:'воды',t:{en:'water'}, next:[]},
+  {c:'needs',e:'🍔',l:'Поесть',s:'поесть',t:{en:'I want to eat'}, next:[]},
+
+  // Общение (14)
+  {c:'social',e:'👋',l:'Привет',s:'привет',t:{en:'hello'}, next:['Мама','Братик']},
+  {c:'social',e:'🖐️',l:'Пока',s:'пока',t:{en:'bye'}, next:[]},
+  {c:'social',e:'✅',l:'Да',s:'да',t:{en:'yes'}, next:[]},
+  {c:'social',e:'❌',l:'Нет',s:'нет',t:{en:'no'}, next:[]},
+  {c:'social',e:'🙏',l:'Спасибо',s:'спасибо',t:{en:'thank you'}, next:[]},
+  {c:'social',e:'🤝',l:'Пожалуйста',s:'пожалуйста',t:{en:'please'}, next:[]},
+  {c:'social',e:'👍',l:'Хорошо',s:'хорошо',t:{en:'okay'}, next:[]},
+  {c:'social',e:'👎',l:'Плохо',s:'плохо',t:{en:'bad'}, next:['Помощь']},
+  {c:'social',e:'😔',l:'Извини',s:'извини',t:{en:'sorry'}, next:[]},
+  {c:'social',e:'❤️',l:'Люблю',s:'люблю',t:{en:'I love you'}, next:['Мама','Папа','Братик']},
+  {c:'social',e:'✋',l:'Подожди',s:'подожди',t:{en:'wait'}, next:[]},
+  {c:'social',e:'👌',l:'Согласен',s:'согласен',t:{en:'agree'}, next:[]},
+  {c:'social',e:'🙅',l:'Не хочу',s:'не хочу',t:{en:'I don\'t want'}, next:[]},
+  {c:'social',e:'😊',l:'Здравствуйте',s:'здравствуйте',t:{en:'good day'}, next:[]},
+
+  // Действия (14)
+  {c:'actions',e:'🚶',l:'Идти',s:'идти',t:{en:'go'}, next:['Дом','Работа']},
+  {c:'actions',e:'🎮',l:'Играть',s:'играть',t:{en:'play'}, next:['Рюма','Братик']},
+  {c:'actions',e:'👀',l:'Смотреть',s:'смотреть',t:{en:'look'}, next:['ТВ','Книга']},
+  {c:'actions',e:'👂',l:'Слушать',s:'слушать',t:{en:'listen'}, next:['Музыка','ТВ']},
+  {c:'actions',e:'🤲',l:'Дать',s:'дать',t:{en:'give'}, next:['Вода','Печенье']},
+  {c:'actions',e:'🌳',l:'Гулять',s:'гулять',t:{en:'walk'}, next:['Улица','Парк', 'Рюма']},
+  {c:'actions',e:'🛋️',l:'Отдыхать',s:'отдохнуть',t:{en:'rest'}, next:['Дом']},
+  {c:'actions',e:'🏃',l:'Бегать',s:'бегать',t:{en:'run'}, next:['Улица']},
+  {c:'actions',e:'🫴',l:'Взять',s:'взять',t:{en:'take'}, next:['Телефон']},
+  {c:'actions',e:'👉',l:'Показать',s:'показать',t:{en:'show'}, next:['Мама','Папа']},
+  {c:'actions',e:'🧍',l:'Стоять',s:'стоять',t:{en:'stand'}, next:[]},
+  {c:'actions',e:'🪑',l:'Сидеть',s:'сидеть',t:{en:'sit'}, next:[]},
+  {c:'actions',e:'🔓',l:'Открыть',s:'открыть',t:{en:'open'}, next:[]},
+  {c:'actions',e:'🔒',l:'Закрыть',s:'закрыть',t:{en:'close'}, next:[]},
+
+  // Люди (15 - добавили братика)
+  {c:'people',e:'👩',l:'Мама',s:'мама',t:{en:'mom'}, next:['Помощь','Люблю']},
+  {c:'people',e:'👨',l:'Папа',s:'папа',t:{en:'dad'}, next:['Помощь','Люблю']},
+  {c:'people',e:'👦',l:'Братик',s:'братик',t:{en:'brother'}, next:['Играть','Привет']}, // НОВОЕ
+  {c:'people',e:'👵',l:'Бабушка',s:'бабушка',t:{en:'grandma'}, next:[]},
+  {c:'people',e:'👴',l:'Дедушка',s:'дедушка',t:{en:'grandpa'}, next:[]},
+  {c:'people',e:'👧',l:'Сестра',s:'сестра',t:{en:'sister'}, next:['Играть']},
+  {c:'people',e:'🧑‍🤝‍🧑',l:'Друг',s:'друг',t:{en:'friend'}, next:['Играть','Привет']},
+  {c:'people',e:'👭',l:'Подруга',s:'подруга',t:{en:'friend'}, next:['Играть','Привет']},
+  {c:'people',e:'🧑‍⚕️',l:'Врач',s:'врач',t:{en:'doctor'}, next:['Помощь']},
+  {c:'people',e:'👩‍🏫',l:'Учитель',s:'учитель',t:{en:'teacher'}, next:['Помощь']},
+  {c:'people',e:'🧑',l:'Я',s:'я',t:{en:'I'}, next:['Хочу','Идти']},
+  {c:'people',e:'🫵',l:'Ты',s:'ты',t:{en:'you'}, next:['Идти','Играть']},
+  {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',t:{en:'family'}, next:['Дом']},
+  {c:'people',e:'💼',l:'Коллега',s:'коллега',t:{en:'colleague'}, next:['Работа']},
+  {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',t:{en:'dog Ruma'}, next:['Гулять','Играть']}, // НОВОЕ
+
+  // Еда (19 - добавили суши, чипсики, пиво, квас)
+  {c:'food',e:'💧',l:'Вода',s:'воду',t:{en:'water'}, next:['Пить']},
+  {c:'food',e:'🍎',l:'Яблоко',s:'яблоко',t:{en:'apple'}, next:['Еда']},
+  {c:'food',e:'🍞',l:'Хлеб',s:'хлеб',t:{en:'bread'}, next:['Еда']},
+  {c:'food',e:'🧃',l:'Сок',s:'сок',t:{en:'juice'}, next:['Пить']},
+  {c:'food',e:'🍲',l:'Суп',s:'суп',t:{en:'soup'}, next:['Еда']},
+  {c:'food',e:'🥣',l:'Каша',s:'кашу',t:{en:'porridge'}, next:['Еда']},
+  {c:'food',e:'🍵',l:'Чай',s:'чай',t:{en:'tea'}, next:['Пить']},
+  {c:'food',e:'🍖',l:'Мясо',s:'мясо',t:{en:'meat'}, next:['Еда']},
+  {c:'food',e:'🐟',l:'Рыба',s:'рыбу',t:{en:'fish'}, next:['Еда']},
+  {c:'food',e:'🍌',l:'Банан',s:'банан',t:{en:'banana'}, next:['Еда']},
+  {c:'food',e:'🍊',l:'Апельсин',s:'апельсин',t:{en:'orange'}, next:['Еда']},
+  {c:'food',e:'🧀',l:'Сыр',s:'сыр',t:{en:'cheese'}, next:['Еда']},
+  {c:'food',e:'🥛',l:'Молоко',s:'молоко',t:{en:'milk'}, next:['Пить']},
+  {c:'food',e:'☕',l:'Кофе',s:'кофе',t:{en:'coffee'}, next:['Пить']},
+  {c:'food',e:'🍣',l:'Суши',s:'суши',t:{en:'sushi'}, next:['Еда']}, // НОВОЕ
+  {c:'food',e:'🍟',l:'Чипсики',s:'чипсики',t:{en:'chips'}, next:['Еда']}, // НОВОЕ
+  {c:'food',e:'🍺',l:'Пиво',s:'пиво',t:{en:'beer'}, next:['Пить']}, // НОВОЕ
+  {c:'food',e:'🥖',l:'Квас',s:'квас',t:{en:'kvass'}, next:['Пить']}, // НОВОЕ
+  {c:'food',e:'🍬',l:'Конфета',s:'конфету',t:{en:'candy'}, next:['Еда']}, // НОВОЕ
+
+  // Эмоции (14)
+  {c:'emotions',e:'😊',l:'Радость',s:'мне радостно',t:{en:'I am happy'}, next:[]},
+  {c:'emotions',e:'😢',l:'Грусть',s:'мне грустно',t:{en:'I am sad'}, next:[]},
+  {c:'emotions',e:'😠',l:'Злость',s:'я злюсь',t:{en:'I am angry'}, next:[]},
+  {c:'emotions',e:'😨',l:'Страх',s:'мне страшно',t:{en:'I am scared'}, next:['Мама','Помощь']},
+  {c:'emotions',e:'🥱',l:'Устал',s:'я устал',t:{en:'I am tired'}, next:['Спать']},
+  {c:'emotions',e:'😌',l:'Спокойно',s:'мне спокойно',t:{en:'I am calm'}, next:[]},
+  {c:'emotions',e:'😄',l:'Весело',s:'мне весело',t:{en:'I am having fun'}, next:[]},
+  {c:'emotions',e:'😞',l:'Обидно',s:'мне обидно',t:{en:'I am upset'}, next:[]},
+  {c:'emotions',e:'🥱',l:'Скучно',s:'мне скучно',t:{en:'I am bored'}, next:['Играть']},
+  {c:'emotions',e:'😃',l:'Хорошо',s:'мне хорошо',t:{en:'I feel good'}, next:[]},
+  {c:'emotions',e:'😣',l:'Плохо',s:'мне плохо',t:{en:'I feel bad'}, next:['Помощь']},
+  {c:'emotions',e:'😱',l:'Боюсь',s:'я боюсь',t:{en:'I am afraid'}, next:['Мама']},
+  {c:'emotions',e:'😂',l:'Смешно',s:'мне смешно',t:{en:'it is funny'}, next:[]},
+  {c:'emotions',e:'😭',l:'Плакать',s:'я плачу',t:{en:'I am crying'}, next:['Помощь']},
+
+  // Места (14)
+  {c:'places',e:'🏠',l:'Дом',s:'домой',t:{en:'home'}, next:['Идти']},
+  {c:'places',e:'🏫',l:'Школа',s:'в школу',t:{en:'school'}, next:['Идти']},
+  {c:'places',e:'🛣️',l:'Улица',s:'на улицу',t:{en:'outside'}, next:['Идти']},
+  {c:'places',e:'⏰',l:'Сейчас',s:'сейчас',t:{en:'now'}, next:['Идти','Еда']},
+  {c:'places',e:'⏳',l:'Потом',s:'потом',t:{en:'later'}, next:[]},
+  {c:'places',e:'🌅',l:'Утро',s:'утром',t:{en:'morning'}, next:['Еда']},
+  {c:'places',e:'🌆',l:'Вечер',s:'вечером',t:{en:'evening'}, next:['Спать']},
+  {c:'places',e:'🌃',l:'Ночь',s:'ночью',t:{en:'night'}, next:['Спать']},
+  {c:'places',e:'🍳',l:'Кухня',s:'на кухне',t:{en:'kitchen'}, next:['Еда']},
+  {c:'places',e:'🛏️',l:'Спальня',s:'в спальне',t:{en:'bedroom'}, next:['Спать']},
+  {c:'places',e:'🌳',l:'Парк',s:'в парк',t:{en:'park'}, next:['Идти']},
+  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',t:{en:'store'}, next:['Идти']},
+  {c:'places',e:'🚽',l:'Туалет',s:'в туалет',t:{en:'toilet'}, next:['Идти']},
+  {c:'places',e:'💼',l:'Работа',s:'на работу',t:{en:'work'}, next:['Идти']},
+  
+  // Вещи (7)
+  {c:'things',e:'🔑',l:'Ключи',s:'ключи',t:{en:'keys'}, next:[]},
+  {c:'things',e:'💵',l:'Деньги',s:'деньги',t:{en:'money'}, next:[]},
+  {c:'things',e:'👕',l:'Одежда',s:'одежду',t:{en:'clothes'}, next:[]},
+  {c:'things',e:'👟',l:'Обувь',s:'обувь',t:{en:'shoes'}, next:[]},
+  {c:'things',e:'💊',l:'Лекарство',s:'лекарство',t:{en:'medicine'}, next:[]},
+  {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',t:{en:'charger'}, next:[]},
+  {c:'things',e:'👓',l:'Очки',s:'очки',t:{en:'glasses'}, next:[]}
+];
+
+const catNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи' };
+const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things' };
+
+let phrase = [];
+let activeCat = 'needs';
+let isLarge = false;
+let currentLang = 'ru';
+let voices = [];
+let selectedVoice = null;
+
+// --- ШАБЛОНЫ С СОХРАНЕНИЕМ ---
+let templates = JSON.parse(localStorage.getItem('aac_templates'));
+if (!templates) {
+  templates = [
+    { text: "Дайте пожалуйста попить", say: "дайте пожалуйста попить", icon: "🥤" },
+    { text: "Я хочу есть", say: "я хочу есть", icon: "🍔" },
+    { text: "Мне нужно в туалет", say: "мне нужно в туалет", icon: "🚽" },
+    { text: "Мне больно, помогите", say: "мне больно помогите", icon: "🤕" },
+    { text: "Позовите маму", say: "позовите маму", icon: "👩" },
+    { text: "Позовите братика", say: "позовите братика", icon: "👦" }, // НОВОЕ
+    { text: "Позовите папу", say: "позовите папу", icon: "👨" },
+    { text: "Я устал, хочу спать", say: "я устал хочу спать", icon: "😴" },
+    { text: "Дайте пожалуйста телефон", say: "дайте пожалуйста телефон", icon: "📱" },
+    { text: "Хочу суши", say: "хочу суши", icon: "🍣" }, // НОВОЕ
+    { text: "Хочу чипсики", say: "хочу чипсики", icon: "🍟" }, // НОВОЕ
+    { text: "Дайте пиво", say: "дайте пиво", icon: "🍺" }, // НОВОЕ
+    { text: "Дайте квас", say: "дайте квас", icon: "🥖" }, // НОВОЕ
+    { text: "Погулять с Рюмой", say: "погулять с Рюмой", icon: "🐶" } // НОВОЕ
+  ];
+}
+
+function saveTemplates() { localStorage.setItem('aac_templates', JSON.stringify(templates)); }
+
+function renderPhrases() {
+  const list = document.getElementById('phrasesList');
+  list.innerHTML = templates.map((p, idx) => `
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 15px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <span style="font-size: 24px;">${p.icon}</span> ${p.text}
+      </button>
+      <button onclick="deleteTemplate(${idx})" style="padding: 14px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
+    </div>
+  `).join('');
+}
+
+function speakTemplate(idx) {
+  speak(templates[idx].say);
+  document.getElementById('phrasesModal').classList.remove('active');
+}
+
+function deleteTemplate(idx) {
+  templates.splice(idx, 1);
+  saveTemplates();
+  renderPhrases();
+}
+
+function addNewTemplate() {
+  const text = prompt("Введите текст фразы:");
+  if (text) {
+    templates.push({ text: text, say: text.toLowerCase(), icon: "🗣️" });
+    saveTemplates();
+    renderPhrases();
+  }
+}
+
+document.getElementById('phrasesBtn').onclick = () => {
+  renderPhrases();
+  const box = document.querySelector('#phrasesModal .modal-box');
+  if (!document.getElementById('addTplBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'addTplBtn';
+    btn.style = "margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;";
+    btn.innerText = '+ Добавить фразу';
+    btn.onclick = addNewTemplate;
+    box.insertBefore(btn, box.lastElementChild);
+  }
+  document.getElementById('phrasesModal').classList.add('active');
+};
+
+  // --- НОВЫЕ 150 СЛОВ ---
+items.push(
+  {c:'colors',e:'🔴',l:'Красный',s:'красный',t:{en:'red'}, next:[]},
+  {c:'colors',e:'🔵',l:'Синий',s:'синий',t:{en:'blue'}, next:[]},
+  {c:'colors',e:'🟢',l:'Зеленый',s:'зеленый',t:{en:'green'}, next:[]},
+  {c:'colors',e:'🟡',l:'Желтый',s:'желтый',t:{en:'yellow'}, next:[]},
+  {c:'colors',e:'⚫',l:'Черный',s:'черный',t:{en:'black'}, next:[]},
+  {c:'colors',e:'⚪',l:'Белый',s:'белый',t:{en:'white'}, next:[]},
+  {c:'colors',e:'🟠',l:'Оранжевый',s:'оранжевый',t:{en:'orange'}, next:[]},
+  {c:'colors',e:'🟣',l:'Фиолетовый',s:'фиолетовый',t:{en:'purple'}, next:[]},
+  {c:'colors',e:'🟤',l:'Коричневый',s:'коричневый',t:{en:'brown'}, next:[]},
+  {c:'colors',e:'🩷',l:'Розовый',s:'розовый',t:{en:'pink'}, next:[]},
+
+  {c:'body',e:'👤',l:'Голова',s:'голова',t:{en:'head'}, next:['Больно']},
+  {c:'body',e:'💪',l:'Рука',s:'рука',t:{en:'hand'}, next:['Больно']},
+  {c:'body',e:'🦵',l:'Нога',s:'нога',t:{en:'leg'}, next:['Больно']},
+  {c:'body',e:'👁️',l:'Глаз',s:'глаз',t:{en:'eye'}, next:['Больно']},
+  {c:'body',e:'👂',l:'Ухо',s:'ухо',t:{en:'ear'}, next:['Больно']},
+  {c:'body',e:'👄',l:'Рот',s:'рот',t:{en:'mouth'}, next:['Больно']},
+  {c:'body',e:'👅',l:'Язык',s:'язык',t:{en:'tongue'}, next:[]},
+  {c:'body',e:'🦷',l:'Зуб',s:'зуб',t:{en:'tooth'}, next:['Больно']},
+  {c:'body',e:'👃',l:'Нос',s:'нос',t:{en:'nose'}, next:[]},
+  {c:'body',e:'🫃',l:'Живот',s:'живот',t:{en:'stomach'}, next:['Больно']},
+
+  {c:'animals',e:'🐶',l:'Собака',s:'собака',t:{en:'dog'}, next:[]},
+  {c:'animals',e:'🐱',l:'Кошка',s:'кошка',t:{en:'cat'}, next:[]},
+  {c:'animals',e:'🐭',l:'Мышь',s:'мышь',t:{en:'mouse'}, next:[]},
+  {c:'animals',e:'🐰',l:'Кролик',s:'кролик',t:{en:'rabbit'}, next:[]},
+  {c:'animals',e:'🦊',l:'Лиса',s:'лиса',t:{en:'fox'}, next:[]},
+  {c:'animals',e:'🐻',l:'Медведь',s:'медведь',t:{en:'bear'}, next:[]},
+  {c:'animals',e:'🐼',l:'Панда',s:'панда',t:{en:'panda'}, next:[]},
+  {c:'animals',e:'🐨',l:'Коала',s:'коала',t:{en:'koala'}, next:[]},
+  {c:'animals',e:'🐯',l:'Тигр',s:'тигр',t:{en:'tiger'}, next:[]},
+  {c:'animals',e:'🦁',l:'Лев',s:'лев',t:{en:'lion'}, next:[]},
+  {c:'animals',e:'🐮',l:'Корова',s:'корова',t:{en:'cow'}, next:[]},
+  {c:'animals',e:'🐷',l:'Свинья',s:'свинья',t:{en:'pig'}, next:[]},
+  {c:'animals',e:'🐔',l:'Курица',s:'курица',t:{en:'chicken'}, next:[]},
+  {c:'animals',e:'🐦',l:'Птица',s:'птица',t:{en:'bird'}, next:[]},
+  {c:'animals',e:'🐴',l:'Лошадь',s:'лошадь',t:{en:'horse'}, next:[]},
+
+  {c:'transport',e:'🚗',l:'Машина',s:'машина',t:{en:'car'}, next:[]},
+  {c:'transport',e:'🚌',l:'Автобус',s:'автобус',t:{en:'bus'}, next:[]},
+  {c:'transport',e:'🚲',l:'Велосипед',s:'велосипед',t:{en:'bicycle'}, next:[]},
+  {c:'transport',e:'✈️',l:'Самолет',s:'самолет',t:{en:'airplane'}, next:[]},
+  {c:'transport',e:'🚂',l:'Поезд',s:'поезд',t:{en:'train'}, next:[]},
+  {c:'transport',e:'🚢',l:'Корабль',s:'корабль',t:{en:'ship'}, next:[]},
+  {c:'transport',e:'🚑',l:'Скорая',s:'скорая',t:{en:'ambulance'}, next:[]},
+  {c:'transport',e:'🚓',l:'Полиция',s:'полиция',t:{en:'police'}, next:[]},
+  {c:'transport',e:'🚕',l:'Такси',s:'такси',t:{en:'taxi'}, next:[]},
+  {c:'transport',e:'🚁',l:'Вертолет',s:'вертолет',t:{en:'helicopter'}, next:[]},
+
+  {c:'nature',e:'☀️',l:'Солнце',s:'солнце',t:{en:'sun'}, next:[]},
+  {c:'nature',e:'🌧️',l:'Дождь',s:'дождь',t:{en:'rain'}, next:[]},
+  {c:'nature',e:'❄️',l:'Снег',s:'снег',t:{en:'snow'}, next:[]},
+  {c:'nature',e:'🌪️',l:'Ветер',s:'ветер',t:{en:'wind'}, next:[]},
+  {c:'nature',e:'🔥',l:'Огонь',s:'огонь',t:{en:'fire'}, next:[]},
+  {c:'nature',e:'🌊',l:'Море',s:'море',t:{en:'sea'}, next:[]},
+  {c:'nature',e:'⛰️',l:'Горы',s:'горы',t:{en:'mountains'}, next:[]},
+  {c:'nature',e:'🌲',l:'Лес',s:'лес',t:{en:'forest'}, next:[]},
+  {c:'nature',e:'🌙',l:'Луна',s:'луна',t:{en:'moon'}, next:[]},
+  {c:'nature',e:'⭐',l:'Звезда',s:'звезда',t:{en:'star'}, next:[]}
+);
+
+// Добавляем новые категории в списки
+catNames.colors = 'Цвета'; catColors.colors = 'c-colors';
+catNames.body = 'Тело'; catColors.body = 'c-body';
+catNames.animals = 'Животные'; catColors.animals = 'c-animals';
+catNames.transport = 'Транспорт'; catColors.transport = 'c-transport';
+catNames.nature = 'Природа'; catColors.nature = 'c-nature';
+
+// --- ЛОГИКА ---
+function render() {
+  document.getElementById('tabs').innerHTML = Object.keys(catNames).map(key => 
+    `<button class="tab ${key === activeCat ? 'active' : ''}" onclick="setCat('${key}')">${catNames[key]}</button>`
+  ).join('');
+
+  const gridEl = document.getElementById('grid');
+  gridEl.className = `grid ${isLarge ? 'big' : ''}`;
+  gridEl.innerHTML = '';
+  
+  const filteredItems = items.filter(it => it.c === activeCat);
+  
+  filteredItems.forEach((it, index) => {
+    const card = document.createElement('div');
+    card.className = `card ${catColors[it.c]} anim-pop`;
+    card.style.animationDelay = `${index * 0.02}s`;
+    card.innerHTML = `<div class="emoji">${it.e}</div><span>${it.l}</span>`;
+    card.onclick = () => addItem(it.l);
+    gridEl.appendChild(card);
+  });
+  
+  renderSuggestions();
+}
+
+function setCat(cat) { activeCat = cat; render(); }
+
+function addItem(label) {
+  const item = items.find(i => i.l === label);
+  if (!item) return;
+  
+  logActivity(item.l); // Записываем в статистику
+  
+  phrase.push(item);
+  updateStrip();
+  speak(getWordToSay(item));
+  if (item.next && item.next.length > 0) {
+    renderSuggestions(item.next);
+  } else {
+    renderSuggestions([]);
+  }
+}
+
+function renderSuggestions(words) {
+  const container = document.getElementById('suggestions');
+  const title = document.getElementById('suggestTitle');
+  if (!words || words.length === 0) {
+    container.innerHTML = '';
+    title.style.display = 'none';
+    return;
+  }
+  title.style.display = 'block';
+  container.innerHTML = '';
+  words.forEach((wordLabel, idx) => {
+    const it = items.find(i => i.l === wordLabel);
+    if (!it) return;
+    const div = document.createElement('div');
+    div.className = 'suggest-card anim-pop';
+    div.style.animationDelay = `${idx * 0.05}s`;
+    div.innerHTML = `${it.e} <span>${it.l}</span>`;
+    div.onclick = () => addItem(it.l);
+    container.appendChild(div);
+  });
+}
+
+function updateStrip() {
+  const strip = document.getElementById('strip');
+  if (!phrase.length) {
+    strip.innerHTML = '<span style="color:var(--text-light); font-weight:500; font-size:13px;">Нажимайте на карточки...</span>';
+  } else {
+    strip.innerHTML = phrase.map((p, idx) => 
+      `<div class="chip anim-pop" onclick="removeItem(${idx})">${p.e} ${p.l} ✕</div>`
+    ).join('');
+  }
+  strip.scrollLeft = strip.scrollWidth;
+}
+
+function removeItem(idx) {
+  phrase.splice(idx, 1);
+  updateStrip();
+}
+
+function getWordToSay(item) {
+  if (currentLang === 'ru') return item.s;
+  if (item.t && item.t[currentLang]) return item.t[currentLang];
+  return item.s;
+}
+
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    let langCode = 'ru-RU';
+    if (currentLang === 'en') langCode = 'en-US';
+    u.lang = langCode;
+    if (selectedVoice) u.voice = selectedVoice;
+    u.rate = parseFloat(document.getElementById('rate').value);
+    u.pitch = parseFloat(document.getElementById('pitch').value);
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function loadVoices() {
+  if (!('speechSynthesis' in window)) return;
+  voices = window.speechSynthesis.getVoices();
+  const select = document.getElementById('voiceSelect');
+  select.innerHTML = '';
+  
+  let filtered = voices.filter(v => {
+    const lang = v.lang.toLowerCase();
+    if (currentLang === 'ru') return lang.includes('ru');
+    if (currentLang === 'en') return lang.includes('en');
+  });
+
+  const maleNames = ['юрий', 'дмитрий', 'павел', 'артем', 'петр', 'максим', 'иван', 'александр', 'yuri', 'dmitry', 'pavel', 'artem', 'male', 'муж', 'mark', 'daniel', 'alex', 'david', 'thomas', 'james'];
+  
+  let maleVoices = filtered.filter(v => {
+    const name = v.name.toLowerCase();
+    return maleNames.some(maleName => name.includes(maleName));
+  });
+
+  if (maleVoices.length === 0) maleVoices = filtered; 
+
+  if (maleVoices.length === 0) {
+    select.innerHTML = '<option>Голоса не найдены</option>';
+    selectedVoice = null;
+  } else {
+    maleVoices.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.voiceURI;
+      opt.textContent = v.name + ' (' + v.lang + ')';
+      select.appendChild(opt);
+    });
+    selectedVoice = maleVoices[0];
+    select.value = selectedVoice.voiceURI;
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  const btn = document.getElementById('langBtn');
+  if (lang === 'ru') btn.innerText = 'RU';
+  if (lang === 'en') btn.innerText = 'EN';
+  loadVoices();
+  if (phrase.length > 0) speak(getWordToSay(phrase[phrase.length - 1]));
+}
+
+document.getElementById('speakBtn').onclick = () => {
+  if (phrase.length) speak(phrase.map(p => getWordToSay(p)).join(' '));
+};
+document.getElementById('backBtn').onclick = () => {
+  if (phrase.length) { phrase.pop(); updateStrip(); }
+};
+document.getElementById('clearBtn').onclick = () => {
+  phrase = [];
+  updateStrip();
+  renderSuggestions([]);
+};
+
+document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').classList.add('active');
+document.getElementById('themeBtn').onclick = () => document.body.classList.toggle('dark');
+document.getElementById('langBtn').onclick = () => {
+  if (currentLang === 'ru') setLang('en');
+  else setLang('ru');
+};
+
+document.getElementById('voiceSelect').onchange = (e) => {
+  selectedVoice = voices.find(v => v.voiceURI === e.target.value);
+};
+
+document.getElementById('testVoiceBtn').onclick = () => {
+  speak(currentLang === 'ru' ? 'Проверка голоса' : 'Voice test');
+};
+
+document.getElementById('sizeBtn').onclick = (e) => {
+  isLarge = !isLarge;
+  e.target.innerText = isLarge ? 'Вкл' : 'Выкл';
+  document.getElementById('grid').classList.toggle('big', isLarge);
+};
+
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  setTimeout(loadVoices, 300);
+}
+
+render();
+</script>
+</body>
+</html>
