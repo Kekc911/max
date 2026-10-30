@@ -73,7 +73,6 @@
   .modal-box label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
   select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; }
 
-  /* Игры */
   .game-grid { display: grid; gap: 8px; margin-bottom: 15px; }
   .game-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
   .game-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
@@ -123,7 +122,6 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<!-- Окно фраз -->
 <div id="phrasesModal" class="modal">
   <div class="modal-box">
     <h2 style="text-align:center; font-size:18px; margin-bottom: 10px;">Готовые фразы</h2>
@@ -132,7 +130,6 @@
   </div>
 </div>
 
-<!-- Окно игры "Найди флаги" -->
 <div id="gameModal" class="modal">
   <div class="modal-box" style="max-width: 400px;">
     <h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🌍 Найди флаги</h2>
@@ -147,7 +144,6 @@
   </div>
 </div>
 
-<!-- Окно игры "Найди картинку" -->
 <div id="quizModal" class="modal">
   <div class="modal-box" style="max-width: 380px;">
     <h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🧩 Найди картинку</h2>
@@ -159,7 +155,6 @@
   </div>
 </div>
 
-<!-- Окно настроек -->
 <div id="settingsModal" class="modal">
   <div class="modal-box">
     <h2 style="text-align:center; font-size:16px;">Настройки</h2>
@@ -175,8 +170,7 @@
 </div>
 
 <script>
-
-  // --- 1. ИНТЕРАКТИВНЫЙ СТАРТОВЫЙ ЭКРАН ---
+// --- 1. ИНТЕРАКТИВНЫЙ СТАРТОВЫЙ ЭКРАН ---
 let step = 0; 
 
 function startGreeting() {
@@ -296,7 +290,7 @@ function showStats() {
   document.body.appendChild(modal);
 }
 
-// --- 3. СЛОВА (105 базовых + персональные) ---
+// --- 3. СЛОВА ---
 const items = [
   {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',t:{en:'I want'}, next:['Пить','Еда','Спать']},
   {c:'needs',e:'🥤',l:'Пить',s:'пить',t:{en:'drink'}, next:['Вода','Пиво','Квас']},
@@ -420,11 +414,10 @@ const items = [
 const catNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи' };
 const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things' };
 
-  // --- 4. ГОТОВЫЕ ФРАЗЫ (30+ ШТУК) ---
+// --- 4. ГОТОВЫЕ ФРАЗЫ (30+ ШТУК) ---
 let templates = JSON.parse(localStorage.getItem('aac_templates'));
 if (!templates) {
   templates = [
-    // ЕДА И ПИТЬЕ
     { text: "Хочу пить", say: "хочу пить", icon: "🥤" },
     { text: "Хочу есть", say: "хочу есть", icon: "🍽️" },
     { text: "Дайте пожалуйста воды", say: "дайте пожалуйста воды", icon: "💧" },
@@ -434,14 +427,10 @@ if (!templates) {
     { text: "Дайте квас", say: "дайте квас", icon: "🥖" },
     { text: "Хочу конфету", say: "хочу конфету", icon: "🍬" },
     { text: "Хочу кофе", say: "хочу кофе", icon: "☕" },
-
-    // РЮМА (СОБАЧКА)
     { text: "Рюма, иди кушать", say: "Рюма, иди кушать", icon: "🐶" },
     { text: "Рюма, гулять", say: "Рюма, гулять", icon: "🦴" },
     { text: "Погулять с Рюмой", say: "погулять с Рюмой", icon: "🌳" },
     { text: "Позови Рюму", say: "позови Рюму", icon: "📣" },
-
-    // ПОТРЕБНОСТИ И ЗДОРОВЬЕ
     { text: "Мне нужно в туалет", say: "мне нужно в туалет", icon: "🚽" },
     { text: "Мне больно, помогите", say: "мне больно помогите", icon: "🤕" },
     { text: "Позовите врача", say: "позовите врача", icon: "🚑" },
@@ -449,13 +438,9 @@ if (!templates) {
     { text: "Дайте пожалуйста телефон", say: "дайте пожалуйста телефон", icon: "📱" },
     { text: "Дайте лекарство", say: "дайте лекарство", icon: "💊" },
     { text: "Мне нужна помощь", say: "мне нужна помощь", icon: "🆘" },
-
-    // ЛЮДИ
     { text: "Позовите маму", say: "позовите маму", icon: "👩" },
     { text: "Позовите папу", say: "позовите папу", icon: "👨" },
     { text: "Позовите братика", say: "позовите братика", icon: "👦" },
-
-    // ЭМОЦИИ И ОБЩЕНИЕ
     { text: "Хочу поговорить", say: "хочу поговорить", icon: "🗣️" },
     { text: "Обними меня", say: "обними меня", icon: "🤗" },
     { text: "Оставь меня одного", say: "оставь меня одного", icon: "🚪" },
@@ -463,8 +448,6 @@ if (!templates) {
     { text: "Мне грустно", say: "мне грустно", icon: "😢" },
     { text: "Мне страшно", say: "мне страшно", icon: "😨" },
     { text: "Я злюсь", say: "я злюсь", icon: "😠" },
-
-    // ДЕЙСТВИЯ
     { text: "Пойдем гулять", say: "пойдем гулять", icon: "🌳" },
     { text: "Хочу домой", say: "хочу домой", icon: "🏠" },
     { text: "Включи телевизор", say: "включи телевизор", icon: "📺" },
@@ -532,10 +515,7 @@ function loadVoices() {
   const select = document.getElementById('voiceSelect');
   select.innerHTML = '';
   
-  // Ищем только русские голоса
   let filtered = voices.filter(v => v.lang.toLowerCase().includes('ru'));
-  
-  // Фильтруем мужские (по именам)
   const maleNames = ['юрий', 'дмитрий', 'павел', 'артем', 'петр', 'максим', 'иван', 'александр', 'yuri', 'dmitry', 'pavel', 'artem', 'male', 'муж'];
   let maleVoices = filtered.filter(v => {
     const name = v.name.toLowerCase();
@@ -571,158 +551,7 @@ function speak(text) {
   }
 }
 
-  // --- 4. ГОТОВЫЕ ФРАЗЫ (30+ ШТУК) ---
-let templates = JSON.parse(localStorage.getItem('aac_templates'));
-if (!templates) {
-  templates = [
-    // ЕДА И ПИТЬЕ
-    { text: "Хочу пить", say: "хочу пить", icon: "🥤" },
-    { text: "Хочу есть", say: "хочу есть", icon: "🍽️" },
-    { text: "Дайте пожалуйста воды", say: "дайте пожалуйста воды", icon: "💧" },
-    { text: "Хочу суши", say: "хочу суши", icon: "🍣" },
-    { text: "Хочу чипсики", say: "хочу чипсики", icon: "🍟" },
-    { text: "Дайте пиво", say: "дайте пиво", icon: "🍺" },
-    { text: "Дайте квас", say: "дайте квас", icon: "🥖" },
-    { text: "Хочу конфету", say: "хочу конфету", icon: "🍬" },
-    { text: "Хочу кофе", say: "хочу кофе", icon: "☕" },
-
-    // РЮМА (СОБАЧКА)
-    { text: "Рюма, иди кушать", say: "Рюма, иди кушать", icon: "🐶" },
-    { text: "Рюма, гулять", say: "Рюма, гулять", icon: "🦴" },
-    { text: "Погулять с Рюмой", say: "погулять с Рюмой", icon: "🌳" },
-    { text: "Позови Рюму", say: "позови Рюму", icon: "📣" },
-
-    // ПОТРЕБНОСТИ И ЗДОРОВЬЕ
-    { text: "Мне нужно в туалет", say: "мне нужно в туалет", icon: "🚽" },
-    { text: "Мне больно, помогите", say: "мне больно помогите", icon: "🤕" },
-    { text: "Позовите врача", say: "позовите врача", icon: "🚑" },
-    { text: "Я устал, хочу спать", say: "я устал хочу спать", icon: "😴" },
-    { text: "Дайте пожалуйста телефон", say: "дайте пожалуйста телефон", icon: "📱" },
-    { text: "Дайте лекарство", say: "дайте лекарство", icon: "💊" },
-    { text: "Мне нужна помощь", say: "мне нужна помощь", icon: "🆘" },
-
-    // ЛЮДИ
-    { text: "Позовите маму", say: "позовите маму", icon: "👩" },
-    { text: "Позовите папу", say: "позовите папу", icon: "👨" },
-    { text: "Позовите братика", say: "позовите братика", icon: "👦" },
-
-    // ЭМОЦИИ И ОБЩЕНИЕ
-    { text: "Хочу поговорить", say: "хочу поговорить", icon: "🗣️" },
-    { text: "Обними меня", say: "обними меня", icon: "🤗" },
-    { text: "Оставь меня одного", say: "оставь меня одного", icon: "🚪" },
-    { text: "Побудь со мной", say: "побудь со мной", icon: "🧑‍🤝‍🧑" },
-    { text: "Мне грустно", say: "мне грустно", icon: "😢" },
-    { text: "Мне страшно", say: "мне страшно", icon: "😨" },
-    { text: "Я злюсь", say: "я злюсь", icon: "😠" },
-
-    // ДЕЙСТВИЯ
-    { text: "Пойдем гулять", say: "пойдем гулять", icon: "🌳" },
-    { text: "Хочу домой", say: "хочу домой", icon: "🏠" },
-    { text: "Включи телевизор", say: "включи телевизор", icon: "📺" },
-    { text: "Включи музыку", say: "включи музыку", icon: "🎵" },
-    { text: "Поиграем", say: "поиграем", icon: "🎮" }
-  ];
-}
-
-function saveTemplates() { localStorage.setItem('aac_templates', JSON.stringify(templates)); }
-
-function renderPhrases() {
-  const list = document.getElementById('phrasesList');
-  list.innerHTML = templates.map((p, idx) => `
-    <div style="display: flex; gap: 8px; align-items: center;">
-      <button onclick="speakTemplate(${idx})" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 14px; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-        <span style="font-size: 24px;">${p.icon}</span> <span style="line-height: 1.2;">${p.text}</span>
-      </button>
-      <button onclick="deleteTemplate(${idx})" style="padding: 12px; border-radius: 10px; border: none; background: #fee2e2; color: #dc2626; font-weight: bold; cursor: pointer;">✕</button>
-    </div>
-  `).join('');
-}
-
-function speakTemplate(idx) {
-  speak(templates[idx].say);
-  document.getElementById('phrasesModal').classList.remove('active');
-}
-
-function deleteTemplate(idx) {
-  templates.splice(idx, 1);
-  saveTemplates();
-  renderPhrases();
-}
-
-function addNewTemplate() {
-  const text = prompt("Введите текст новой фразы (например: Дайте яблоко):");
-  if (text) {
-    templates.push({ text: text, say: text.toLowerCase(), icon: "🗣️" });
-    saveTemplates();
-    renderPhrases();
-  }
-}
-
-document.getElementById('phrasesBtn').onclick = () => {
-  renderPhrases();
-  const box = document.querySelector('#phrasesModal .modal-box');
-  if (!document.getElementById('addTplBtn')) {
-    const btn = document.createElement('button');
-    btn.id = 'addTplBtn';
-    btn.style = "margin-top: 10px; padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;";
-    btn.innerText = '+ Добавить свою фразу';
-    btn.onclick = addNewTemplate;
-    box.insertBefore(btn, box.lastElementChild);
-  }
-  document.getElementById('phrasesModal').classList.add('active');
-};
-
-// --- 5. СИСТЕМА ОЗВУЧКИ (ГОЛОСА) ---
-let voices = [];
-let selectedVoice = null;
-let isLarge = false;
-
-function loadVoices() {
-  if (!('speechSynthesis' in window)) return;
-  voices = window.speechSynthesis.getVoices();
-  const select = document.getElementById('voiceSelect');
-  select.innerHTML = '';
-  
-  // Ищем только русские голоса
-  let filtered = voices.filter(v => v.lang.toLowerCase().includes('ru'));
-  
-  // Фильтруем мужские (по именам)
-  const maleNames = ['юрий', 'дмитрий', 'павел', 'артем', 'петр', 'максим', 'иван', 'александр', 'yuri', 'dmitry', 'pavel', 'artem', 'male', 'муж'];
-  let maleVoices = filtered.filter(v => {
-    const name = v.name.toLowerCase();
-    return maleNames.some(maleName => name.includes(maleName));
-  });
-
-  if (maleVoices.length === 0) maleVoices = filtered; 
-
-  if (maleVoices.length === 0) {
-    select.innerHTML = '<option>Голоса не найдены</option>';
-    selectedVoice = null;
-  } else {
-    maleVoices.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.voiceURI;
-      opt.textContent = v.name + ' (' + v.lang + ')';
-      select.appendChild(opt);
-    });
-    selectedVoice = maleVoices[0];
-    select.value = selectedVoice.voiceURI;
-  }
-}
-
-function speak(text) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ru-RU';
-    if (selectedVoice) u.voice = selectedVoice;
-    u.rate = parseFloat(document.getElementById('rate').value);
-    u.pitch = parseFloat(document.getElementById('pitch').value);
-    window.speechSynthesis.speak(u);
-  }
-}
-
-  // --- 6. ЛОГИКА ПРИЛОЖЕНИЯ ---
+// --- 6. ЛОГИКА ПРИЛОЖЕНИЯ ---
 let phrase = [];
 let activeCat = 'needs';
 
@@ -896,20 +725,13 @@ document.getElementById('gameBtn').onclick = () => {
   document.getElementById('gameModal').classList.add('active');
 };
 
-// --- 8. ИГРА 2: НАЙДИ КАРТИНКУ (НОВАЯ) ---
+// --- 8. ИГРА 2: НАЙДИ КАРТИНКУ ---
 let quizTargetItem = null;
 
 function startQuiz() {
-  // Берем только те слова, у которых есть эмодзи
   const availableItems = items.filter(i => i.e);
-  
-  // Выбираем случайное правильное слово
   quizTargetItem = availableItems[Math.floor(Math.random() * availableItems.length)];
-  
-  // Выбираем 3 неправильных варианта
   let wrongOptions = availableItems.filter(i => i.l !== quizTargetItem.l).sort(() => 0.5 - Math.random()).slice(0, 3);
-  
-  // Смешиваем правильный и неправильные варианты
   let options = [quizTargetItem, ...wrongOptions].sort(() => 0.5 - Math.random());
   
   document.getElementById('quizTarget').innerText = quizTargetItem.l;
@@ -927,23 +749,17 @@ function startQuiz() {
 
 function checkQuizAnswer(selectedLabel, element) {
   if (selectedLabel === quizTargetItem.l) {
-    // Правильно
     element.style.background = '#dcfce7';
     element.style.borderColor = '#22c55e';
     document.getElementById('quizStatus').innerText = '🎉 Правильно!';
     document.getElementById('quizStatus').style.color = '#059669';
     speak('Молодец! Правильно!');
-    
-    setTimeout(() => {
-      startQuiz();
-    }, 2000);
+    setTimeout(() => { startQuiz(); }, 2000);
   } else {
-    // Неправильно
     element.style.background = '#fee2e2';
     element.style.borderColor = '#dc2626';
     document.getElementById('quizStatus').innerText = '❌ Попробуй еще раз';
     document.getElementById('quizStatus').style.color = '#dc2626';
-    
     setTimeout(() => {
       element.style.background = 'var(--bg)';
       element.style.borderColor = 'var(--border)';
