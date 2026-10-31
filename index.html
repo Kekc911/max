@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Коммуникатор</title>
 <style>
   :root { --bg: #f1f5f9; --surface: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; --primary: #2563eb; --primary-light: #eff6ff; }
@@ -14,36 +16,52 @@
   @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
   .anim-pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
+  @keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+  @keyframes shake-btn {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+  }
+
   #mainApp { display: flex; flex-direction: column; flex: 1; }
   header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: none; box-shadow: 0 4px 15px rgba(0,0,0,0.03); z-index: 20; flex-shrink: 0; position: sticky; top: 0; }
   body.dark header { background: rgba(30, 41, 59, 0.85); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
   
   header h1 { font-size: 14px; font-weight: 800; white-space: nowrap; }
-  .header-actions { display: flex; gap: 4px; position: relative; }
+  .header-actions { display: flex; gap: 4px; position: relative; align-items: center; }
   
   .btn-icon { background: var(--bg); border: none; border-radius: 12px; padding: 8px 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.1s, background 0.2s; display: flex; align-items: center; justify-content: center; }
   .btn-icon:active { transform: scale(0.9); background: var(--border); }
   
   .strip-container { padding: 10px 14px 0; }
-  .strip { min-height: 50px; padding: 8px; background: var(--surface); border: none; border-radius: 16px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+  .strip { min-height: 42px; padding: 4px 8px; background: var(--surface); border: none; border-radius: 12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; }
   .strip::-webkit-scrollbar { display: none; }
   .chip { background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
   
-  .actions { display: flex; gap: 6px; padding: 10px 14px; position: relative; z-index: 10; background: transparent; flex-shrink: 0; }
-  .actions button { padding: 12px 4px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; color: #fff; cursor: pointer; flex: 1; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.1s, filter 0.2s; display: flex; align-items: center; justify-content: center; }
-  .actions button:active { transform: scale(0.95); filter: brightness(0.9); }
-  .btn-speak { background: linear-gradient(135deg, #10b981, #059669); } .btn-back { background: linear-gradient(135deg, #f59e0b, #d97706); } .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  .actions { display: flex; gap: 6px; padding: 8px 14px; position: relative; z-index: 10; background: transparent; flex-shrink: 0; justify-content: space-between; }
+  .actions button { border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s, filter 0.2s; }
+  .actions button:active { transform: scale(0.88); filter: brightness(0.8); }
+  
+  .btn-speak { background: linear-gradient(135deg, #10b981, #059669); flex: 1; height: 52px; border-radius: 14px; font-size: 16px; font-weight: 800; gap: 8px; animation: pulse-green 2s infinite; }
+  .btn-back { background: linear-gradient(135deg, #f59e0b, #d97706); width: 52px; height: 52px; border-radius: 14px; font-size: 24px; }
+  .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); width: 52px; height: 52px; border-radius: 14px; font-size: 24px; }
+  .btn-clear:active { animation: shake-btn 0.3s ease-in-out; }
 
-  .suggestions-container { padding: 0 14px 10px; }
+  .suggestions-container { padding: 0 14px 6px; }
   .suggest-title { font-size: 11px; font-weight: 700; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; }
   .suggestions { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-height: 40px; align-items: center; }
   .suggestions::-webkit-scrollbar { display: none; }
-  .suggest-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-  .suggest-card span { font-weight: 600; font-size: 13px; color: var(--text); }
+  .suggest-card { background: var(--primary-light); border: 1px solid var(--primary); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+  .suggest-card span { font-weight: 600; font-size: 13px; color: var(--primary); }
+  .suggest-card img { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
 
-  .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 4px 14px 10px; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 8px 14px; border-radius: 20px; border: none; background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+  .tab { padding: 6px 12px; border-radius: 12px; border: none; background: var(--surface); color: var(--text-light); font-weight: 600; font-size: 12px; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
   .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; padding: 0 14px 14px; align-content: start; }
@@ -53,7 +71,8 @@
   body.dark .card { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .card:active { transform: scale(0.92); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
   .card .emoji { font-size: 32px; line-height: 1; margin-bottom: 6px; }
-  .grid.big .card .emoji { font-size: 44px; }
+  .card img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; margin-bottom: 6px; }
+  .grid.big .card .emoji, .grid.big .card img { font-size: 44px; width: 55px; height: 55px; }
   .card span { font-weight: 600; font-size: 11px; text-align: center; line-height: 1.1; }
   .grid.big .card span { font-size: 13px; }
   
@@ -80,6 +99,54 @@
   .quiz-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
   .quiz-option { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; transition: transform 0.1s; }
   .quiz-option:active { transform: scale(0.95); }
+
+  /* --- ТЕМА В СТИЛЕ GTA 6 (Вайс-Сити) --- */
+  body {
+    background: linear-gradient(180deg, #1a0b2e 0%, #4a154b 35%, #ff007f 70%, #ffb347 100%) !important;
+    background-attachment: fixed !important;
+    color: #ffffff;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 250px;
+    background: #ffeb3b;
+    border-radius: 50%;
+    box-shadow: 0 0 60px #ff9800, 0 0 120px #ff007f, 0 0 200px #ff007f;
+    z-index: -1;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  header h1 {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 0px #000;
+  }
+  header, .strip, .suggest-card, .card, .actions button, .tab, .modal-box, #quickAccess {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  .card span, .card .emoji, .tab, .suggest-card span, .suggest-title {
+    color: #0f172a !important;
+  }
+  body.dark header, body.dark .strip, body.dark .suggest-card, body.dark .card, body.dark .actions button, body.dark .tab, body.dark .modal-box {
+    background: rgba(30, 41, 59, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  body.dark .card span, body.dark .tab, body.dark .suggest-card span {
+    color: #f8fafc !important;
+  }
+  .btn-speak {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #fff !important;
+    border: none !important;
+  }
 </style>
 </head>
 <body>
@@ -90,6 +157,7 @@
   <header>
     <h1>Коммуникатор</h1>
     <div class="header-actions">
+      <button id="aboutMeBtnHeader" class="btn-icon" style="background: #dc2626; color: white; padding: 8px 12px; font-size: 16px;">🆘</button>
       <button id="phrasesBtn" class="btn-icon">📋</button>
       <button id="settingsBtn" class="btn-icon">⚙️</button>
       <button id="moreBtn" class="btn-icon">⋯</button>
@@ -99,10 +167,10 @@
         <button id="dayBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">💬 Мой день</button>
         <button id="firstThenBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">⏭️ Сначала-Потом</button>
         <button id="readClipboardBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">📖 Прочитать текст</button>
+        <button id="weatherBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🌦️ Погода и одежда</button>
         <button id="quizBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🧩 Картинки</button>
         <button id="gameBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">🎮 Флаги</button>
         <button id="tictactoeBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%;">❌⭕ Крестики-нолики</button>
-        <button id="aboutMeBtn" class="btn-icon" style="text-align: left; justify-content: flex-start; width: 100%; color: #dc2626; font-weight: 800;">🆘 Обо мне</button>
       </div>
     </div>
   </header>
@@ -112,10 +180,10 @@
   </div>
 
   <div class="actions">
-    <button id="speakBtn" class="btn-speak" style="flex: 2;">Сказать</button>
-    <button id="shareBtn" class="btn-speak" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); flex: 1.5; font-size: 11px;">✈️ Поделиться</button>
-    <button id="backBtn" class="btn-back" style="flex: 1;">Стереть</button>
-    <button id="clearBtn" class="btn-clear" style="flex: 1;">Сброс</button>
+    <button id="speakBtn" class="btn-speak">🗣️ Сказать</button>
+    <button id="shareBtn" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); width: 56px; height: 52px; border-radius: 14px; font-size: 28px; box-shadow: 0 4px 10px rgba(139,92,246,0.3);" title="Поделиться">📤</button>
+    <button id="backBtn" class="btn-back" title="Стереть">⌫</button>
+    <button id="clearBtn" class="btn-clear" title="Сброс">🗑️</button>
   </div>
 
   <div class="suggestions-container" style="padding-bottom: 0;">
@@ -137,7 +205,9 @@
 
 <div id="firstThenModal" class="modal"><div class="modal-box" style="max-width: 400px;"><h2 style="text-align:center; font-size:20px; margin-bottom: 15px;">⏭️ Сначала - Потом</h2><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;"><div style="flex: 1; text-align: center;"><div style="font-weight: bold; margin-bottom: 5px; color: var(--text-light);">Сначала:</div><select id="firstSelect" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 14px;"></select><div id="firstDisplay" style="font-size: 60px; min-height: 80px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 2px solid var(--border); border-radius: 12px;">❓</div></div><div style="font-size: 30px; color: var(--primary); font-weight: bold;">➡️</div><div style="flex: 1; text-align: center;"><div style="font-weight: bold; margin-bottom: 5px; color: var(--text-light);">Потом:</div><select id="thenSelect" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 14px;"></select><div id="thenDisplay" style="font-size: 60px; min-height: 80px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 2px solid var(--border); border-radius: 12px;">❓</div></div></div><button onclick="speakFirstThen()" style="margin-top: 20px; padding:14px; border-radius:10px; border:none; background:#059669; color:#fff; font-weight:800; font-size:16px; cursor:pointer;">🔊 Сказать</button><button onclick="document.getElementById('firstThenModal').classList.remove('active')" style="margin-top: 5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
 
-<div id="readClipboardModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">📖 Прочитать текст</h2><textarea id="clipboardText" placeholder="Вставьте текст сюда..." style="min-height:100px; resize:vertical;"></textarea><button id="pasteAutoBtn" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📋 Вставить из буфера</button><button id="readAgainBtn" style="margin-top:5px; padding:14px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:15px; cursor:pointer;">🔊 Прочитать вслух</button><button onclick="document.getElementById('readClipboardModal').classList.remove('active'); window.speechSynthesis.cancel();" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
+<div id="readClipboardModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">📖 Прочитать текст</h2><textarea id="clipboardText" placeholder="Вставьте текст сюда..." style="min-height:100px; resize:vertical;"></textarea><div id="quickRepliesBlock" style="display: none; margin-top: 15px;"><h3 style="font-size: 14px; margin-bottom: 8px; color: var(--text-light);">Быстрые ответы:</h3><div id="quickRepliesContainer" style="display: flex; gap: 6px; flex-wrap: wrap;"></div></div><button id="pasteAutoBtn" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📋 Вставить из буфера</button><button id="readAgainBtn" style="margin-top:5px; padding:14px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:15px; cursor:pointer;">🔊 Прочитать вслух</button><button onclick="document.getElementById('readClipboardModal').classList.remove('active'); window.speechSynthesis.cancel();" style="margin-top:5px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
+
+<div id="weatherModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:20px; margin-bottom:10px;">🌦️ Погода на улице</h2><div id="weatherContent" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height: 150px;"><p>Загрузка...</p></div><button onclick="document.getElementById('weatherModal').classList.remove('active')" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; cursor:pointer;">Закрыть</button></div></div>
 
 <div id="aboutMeModal" class="modal"><div class="modal-box" style="background: #dc2626; color: white; text-align: center; border: 4px solid white;"><h1 style="font-size: 30px; margin-bottom: 15px;">🆘 ОБО МНЕ</h1><div id="aboutMeContent" style="font-size: 20px; font-weight: bold; line-height: 1.5; margin-bottom: 20px;"></div><button onclick="speakAboutMe();" style="padding:15px; border-radius:10px; border:none; background:white; color:#dc2626; font-weight:800; font-size:18px; cursor:pointer; width: 100%; margin-bottom: 10px;">🔊 Прочитать вслух</button><button onclick="document.getElementById('aboutMeModal').classList.remove('active')" style="padding:15px; border-radius:10px; border:none; background:rgba(0,0,0,0.2); color:white; font-weight:800; font-size:16px; cursor:pointer; width: 100%;">Закрыть</button></div></div>
 
@@ -151,31 +221,45 @@
 
 <div id="quizModal" class="modal"><div class="modal-box" style="max-width: 380px;"><h2 style="text-align:center; font-size:20px; margin-bottom: 5px;">🧩 Найди картинку</h2><div style="text-align:center; font-size: 18px; color: var(--text-light); margin-bottom: 10px;">Где находится...</div><div id="quizTarget" style="text-align:center; font-size: 36px; font-weight: 800; margin-bottom: 10px; color: var(--primary);">Яблоко</div><div id="quizOptions" class="quiz-options"></div><div id="quizStatus" style="text-align:center; font-weight:bold; color:#059669; margin-top:15px; min-height: 24px;"></div><button onclick="document.getElementById('quizModal').classList.remove('active')" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Выйти</button></div></div>
 
-<div id="addWordModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Новое слово</h2><label>Название слова</label><input type="text" id="newWordTitle" placeholder="Например: Шаурма"><label>Эмодзи (картинка)</label><input type="text" id="newWordEmoji" placeholder="Например: 🌯"><label>Категория</label><select id="newWordCategory"><option value="needs">✋ Потребности</option><option value="food">🍔 Еда</option><option value="actions">🏃 Действия</option><option value="people">👨‍👩‍👧 Люди</option><option value="emotions">😊 Эмоции</option><option value="places">🏠 Места</option><option value="things">🎒 Вещи</option><option value="game">🎮 Игры</option></select><button onclick="saveNewWord()" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;">💾 Сохранить</button><button onclick="document.getElementById('addWordModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Отмена</button></div></div>
+<div id="addWordModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Новое слово</h2><label>Название слова</label><input type="text" id="newWordTitle" placeholder="Например: Шаурма"><label>Эмодзи (картинка)</label><input type="text" id="newWordEmoji" placeholder="Например: 🌯"><label>Или загрузите фото</label><input type="file" id="newWordPhoto" accept="image/*" capture="environment" style="display:none;" onchange="previewPhoto(event)"><button type="button" onclick="document.getElementById('newWordPhoto').click()" style="padding:10px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer; margin-bottom:10px;">📸 Выбрать фото</button><div id="photoPreview" style="display:none; text-align:center; margin-bottom:10px;"><img id="previewImg" style="max-height:100px; border-radius:10px;"></div><label>Категория</label><select id="newWordCategory"><option value="needs">✋ Потребности</option><option value="food">🍔 Еда</option><option value="actions">🏃 Действия</option><option value="people">👨‍👩‍👧 Люди</option><option value="emotions">😊 Эмоции</option><option value="places">🏠 Места</option><option value="things">🎒 Вещи</option><option value="game">🎮 Игры</option></select><button onclick="saveNewWord()" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;">💾 Сохранить</button><button onclick="document.getElementById('addWordModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Отмена</button></div></div>
 
-<div id="settingsModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:16px;">Настройки</h2><label>Голос</label><select id="voiceSelect"><option>Загрузка...</option></select><label>Скорость <input type="range" id="rate" min="0.5" max="1.8" step="0.1" value="1" style="width:100px;"></label><label>Тон <input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="0.7" style="width:100px;"></label><label>Крупный шрифт <button id="sizeBtn" class="btn-icon">Выкл</button></label><button onclick="document.getElementById('setupAboutModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#f59e0b; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:5px;">⚙️ Настроить "Обо мне"</button><button onclick="document.getElementById('addWordModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">➕ Добавить слово</button><button id="statsBtn" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📊 Статистика</button><button id="testVoiceBtn" style="padding:12px; border-radius:8px; border:none; background:#8b5cf6; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔊 Проверить голос</button><button onclick="clearCacheAndReload()" style="padding:12px; border-radius:8px; border:none; background:#ef4444; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔄 Обновить приложение</button><button onclick="document.getElementById('settingsModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
+<div id="quickSettingsModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:18px; margin-bottom:10px;">Быстрый доступ</h2><p style="font-size:12px; color:var(--text-light); text-align:center; margin-bottom:10px;">Нажмите на слова, чтобы добавить/убрать их с главного экрана</p><div id="quickSettingsList" style="display:flex; flex-wrap:wrap; gap:6px; max-height:50vh; overflow-y:auto;"></div><button onclick="document.getElementById('quickSettingsModal').classList.remove('active')" style="margin-top:15px; padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; cursor:pointer;">Готово</button></div></div>
+
+<div id="settingsModal" class="modal"><div class="modal-box"><h2 style="text-align:center; font-size:16px;">Настройки</h2><label>Голос</label><select id="voiceSelect"><option>Загрузка...</option></select><label>Скорость <input type="range" id="rate" min="0.5" max="1.8" step="0.1" value="1" style="width:100px;"></label><label>Тон <input type="range" id="pitch" min="0.5" max="1.5" step="0.1" value="0.7" style="width:100px;"></label><label>Крупный шрифт <button id="sizeBtn" class="btn-icon">Выкл</button></label><button onclick="document.getElementById('settingsModal').classList.remove('active'); document.getElementById('setupAboutModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#f59e0b; color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:5px;">⚙️ Настроить "Обо мне"</button><button onclick="document.getElementById('settingsModal').classList.remove('active'); document.getElementById('addWordModal').classList.add('active')" style="padding:12px; border-radius:8px; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">➕ Добавить слово</button><button onclick="document.getElementById('settingsModal').classList.remove('active'); openQuickAccessSettings()" style="padding:12px; border-radius:8px; border:none; background:#8b5cf6; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">⭐ Настроить быстрый доступ</button><button id="statsBtn" style="padding:12px; border-radius:8px; border:none; background:#059669; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">📊 Статистика</button><button id="testVoiceBtn" style="padding:12px; border-radius:8px; border:none; background:#8b5cf6; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔊 Проверить голос</button><button onclick="clearCacheAndReload()" style="padding:12px; border-radius:8px; border:none; background:#ef4444; color:#fff; font-weight:700; font-size:14px; cursor:pointer;">🔄 Обновить приложение</button><button onclick="document.getElementById('settingsModal').classList.remove('active')" style="padding:12px; border-radius:8px; border:none; background:var(--border); color:var(--text); font-weight:700; font-size:14px; cursor:pointer;">Закрыть</button></div></div>
 
 <script>
 
+// --- 1. СЛОВА ---
 const items = [
-  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать']},
-  {c:'needs',e:'🥤',l:'Пить',s:'пить',next:['Вода','Пиво','Квас']},
-  {c:'needs',e:'🍽️',l:'Еда',s:'есть',next:['Суши','Чипсики','Конфета']},
-  {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',next:['Помощь']},
-  {c:'needs',e:'🛏️',l:'Спать',s:'спать',next:['Помощь']},
-  {c:'needs',e:'🆘',l:'Помощь',s:'помогите',next:['Мама','Папа','Иляха']},
-  {c:'needs',e:'🤕',l:'Больно',s:'мне больно',next:['Помощь']},
-  {c:'needs',e:'🤲',l:'Дать',s:'дайте',next:['Вода','Телефон']},
-  {c:'needs',e:'☝️',l:'Надо',s:'мне надо',next:['Вода','Помощь']},
-  {c:'needs',e:'🛋️',l:'Отдых',s:'отдохнуть',next:['Дом']},
-  {c:'needs',e:'🚑',l:'Врача',s:'вызовите врача',next:[]},
-  {c:'needs',e:'📱',l:'Телефон',s:'телефон',next:[]},
-  {c:'needs',e:'💧',l:'Воды',s:'воды',next:[]},
-  {c:'needs',e:'🍔',l:'Поесть',s:'поесть',next:[]},
+  // Потребности
+  {c:'needs',e:'🙋',l:'Я могу',s:'я могу',next:['Помощь', 'Идти']},
+  {c:'needs',e:'🙅',l:'Я не могу',s:'я не могу',next:['Помощь']},
+  {c:'needs',e:'✋',l:'Я хочу',s:'я хочу',next:['Пить','Еда','Спать','Играть','Гулять']},
+  {c:'needs',e:'🥤',l:'Пить',s:'пить',next:['Вода','Сок','Чай','Кофе','Пиво']},
+  {c:'needs',e:'🍽️',l:'Еда',s:'есть',next:['Суши','Пицца','Суп','Бутерброд']},
+  {c:'needs',e:'🚽',l:'Туалет',s:'в туалет',next:['Помощь','Мама']},
+  {c:'needs',e:'🛏️',l:'Спать',s:'спать',next:['Помощь','Одеяло']},
+  {c:'needs',e:'🆘',l:'Помощь',s:'помогите',next:['Мама','Оля','Иляха','Врач']},
+  {c:'needs',e:'🤕',l:'Больно',s:'мне больно',next:['Помощь', 'Врач']},
+  {c:'needs',e:'🤲',l:'Дать',s:'дайте',next:['Вода','Телефон','Ключи']},
+  {c:'needs',e:'☝️',l:'Надо',s:'мне надо',next:['Вода','Туалет','Домой']},
+  {c:'needs',e:'🛋️',l:'Отдых',s:'отдохнуть',next:['Дом', 'Спальня']},
+  {c:'needs',e:'🚑',l:'Врача',s:'вызовите врача',next:['Помощь']},
+  {c:'needs',e:'📱',l:'Телефон',s:'телефон',next:['Зарядка', 'Играть']},
+  {c:'needs',e:'💧',l:'Воды',s:'воды',next:['Пить']},
+  {c:'needs',e:'🍔',l:'Поесть',s:'поесть',next:['Еда']},
+  {c:'needs',e:'🥵',l:'Жарко',s:'мне жарко',next:['Вода', 'Окно']},
+  {c:'needs',e:'🥶',l:'Холодно',s:'мне холодно',next:['Одеяло', 'Куртка']},
+  {c:'needs',e:'🤒',l:'Температура',s:'у меня температура',next:['Врача']},
+  {c:'needs',e:'🤧',l:'Простуда',s:'я простыл',next:['Врача','Лекарство']},
+  {c:'needs',e:'🤮',l:'Тошнит',s:'меня тошнит',next:['Помощь']},
+  {c:'needs',e:'🥴',l:'Кружится голова',s:'у меня кружится голова',next:['Помощь']},
+  {c:'needs',e:'🤧',l:'Насморк',s:'у меня насморк',next:['Лекарство']},
+  {c:'needs',e:'😮‍💨',l:'Тяжело дышать',s:'мне тяжело дышать',next:['Помощь','Врача']},
 
-  {c:'social',e:'👋',l:'Привет',s:'привет',next:['Иляха','Мама']},
-  {c:'social',e:'📣',l:'Эй',s:'эй',next:['Иляха']},
-  {c:'social',e:'🖐️',l:'Пока',s:'пока',next:[]},
+  // Общение
+  {c:'social',e:'👋',l:'Привет',s:'привет',next:['Как дела?', 'Мама', 'Оля']},
+  {c:'social',e:'🖐️',l:'Пока',s:'пока',next:['До встречи']},
   {c:'social',e:'✅',l:'Да',s:'да',next:[]},
   {c:'social',e:'❌',l:'Нет',s:'нет',next:[]},
   {c:'social',e:'🙏',l:'Спасибо',s:'спасибо',next:[]},
@@ -183,119 +267,109 @@ const items = [
   {c:'social',e:'👍',l:'Хорошо',s:'хорошо',next:[]},
   {c:'social',e:'👎',l:'Плохо',s:'плохо',next:['Помощь']},
   {c:'social',e:'😔',l:'Извини',s:'извини',next:[]},
-  {c:'social',e:'❤️',l:'Люблю',s:'люблю',next:['Мама','Папа','Иляха']},
+  {c:'social',e:'❤️',l:'Люблю',s:'люблю',next:['Мама', 'Оля', 'Бабушка']},
   {c:'social',e:'✋',l:'Подожди',s:'подожди',next:[]},
-  {c:'social',e:'👌',l:'Согласен',s:'согласен',next:[]},
-  {c:'social',e:'🙅',l:'Не хочу',s:'не хочу',next:[]},
-  {c:'social',e:'😊',l:'Здравствуйте',s:'здравствуйте',next:[]},
-  {c:'social',e:'💳',l:'Оплатить',s:'оплатить картой',next:[]},
+  {c:'social',e:'🗣️',l:'Поговорить',s:'хочу поговорить',next:['Мама', 'Оля']},
+  {c:'social',e:'🤗',l:'Обнять',s:'обними меня',next:['Мама', 'Оля']},
+  {c:'social',e:'🚪',l:'Оставь меня',s:'оставь меня одного',next:[]},
+  {c:'social',e:'📣',l:'Эй',s:'эй',next:['Иляха']},
+  {c:'social',e:'✍️',l:'Я не знаю',s:'я не знаю',next:[]},
+  {c:'social',e:'🤝',l:'Я согласен',s:'я согласен',next:[]},
+  {c:'social',e:'🛑',l:'Стоп',s:'стоп',next:[]},
+  {c:'social',e:'🙋',l:'Можно мне?',s:'можно мне',next:[]},
 
-  {c:'actions',e:'🚶',l:'Идти',s:'идти',next:['Дом','Работа']},
-  {c:'actions',e:'🏃',l:'Идешь?',s:'идешь',next:['Пить']},
-  {c:'actions',e:'🤝',l:'Давай',s:'давай',next:['Пить']},
+  // Действия
+  {c:'actions',e:'🚶',l:'Идти',s:'идти',next:['Дом', 'Улица', 'Магазин']},
+  {c:'actions',e:'🏃',l:'Быстрее',s:'быстрее',next:[]},
+  {c:'actions',e:'🛑',l:'Стой',s:'стой',next:[]},
+  {c:'actions',e:'🎮',l:'Играть',s:'играть',next:['PlayStation', 'GTA 6', 'Братик']},
+  {c:'actions',e:'👀',l:'Смотреть',s:'смотреть',next:['ТВ', 'Телефон']},
+  {c:'actions',e:'👂',l:'Слушать',s:'слушать',next:['Музыка']},
+  {c:'actions',e:'🌳',l:'Гулять',s:'гулять',next:['Улица', 'Парк', 'Рюма']},
+  {c:'actions',e:'🫴',l:'Взять',s:'взять',next:['Телефон', 'Ключи']},
+  {c:'actions',e:'👉',l:'Показать',s:'показать',next:['Мама', 'Оля']},
+  {c:'actions',e:'🛒',l:'Купить',s:'купить',next:['Еда', 'Булки', 'Вода']},
   {c:'actions',e:'🤲',l:'Дааай',s:'дааай',next:[]},
-  {c:'actions',e:'🎮',l:'Играть',s:'играть',next:['Иляха','Братик']},
-  {c:'actions',e:'👀',l:'Смотреть',s:'смотреть',next:['ТВ','Книга']},
-  {c:'actions',e:'👂',l:'Слушать',s:'слушать',next:['Музыка','ТВ']},
-  {c:'actions',e:'🌳',l:'Гулять',s:'гулять',next:['Улица','Парк', 'Рюма']},
-  {c:'actions',e:'🛋️',l:'Отдыхать',s:'отдохнуть',next:['Дом']},
-  {c:'actions',e:'🫴',l:'Взять',s:'взять',next:['Телефон']},
-  {c:'actions',e:'👉',l:'Показать',s:'показать',next:['Мама','Папа']},
-  {c:'actions',e:'🗣️',l:'Поговорить',s:'хочу поговорить',next:[]},
-  {c:'actions',e:'🤗',l:'Обнять',s:'обними меня',next:[]},
-  {c:'actions',e:'🚪',l:'Оставь меня',s:'оставь меня одного',next:[]},
-  {c:'actions',e:'🧑‍🤝‍🧑',l:'Побудь со мной',s:'побудь со мной',next:[]},
-  {c:'actions',e:'🛒',l:'Купить',s:'купить',next:['Булки']},
 
-  {c:'people',e:'👩',l:'Мама',s:'мама',next:['Помощь','Люблю']},
-  {c:'people',e:'👨',l:'Папа',s:'папа',next:['Помощь','Люблю']},
-  {c:'people',e:'👦',l:'Братик',s:'братик',next:['Играть','Привет']},
-  {c:'people',e:'🧑',l:'Иляха',s:'Иляха',next:['Идешь?','Давай']},
-  {c:'people',e:'👵',l:'Бабушка',s:'бабушка',next:[]},
-  {c:'people',e:'👴',l:'Дедушка',s:'дедушка',next:[]},
-  {c:'people',e:'👧',l:'Сестра',s:'сестра',next:['Играть']},
-  {c:'people',e:'🧑‍🤝‍🧑',l:'Друг',s:'друг',next:['Играть','Привет']},
-  {c:'people',e:'👭',l:'Подруга',s:'подруга',next:['Играть','Привет']},
-  {c:'people',e:'🧑‍⚕️',l:'Врач',s:'врач',next:['Помощь']},
-  {c:'people',e:'👩‍🏫',l:'Учитель',s:'учитель',next:['Помощь']},
-  {c:'people',e:'🧑',l:'Я',s:'я',next:['Хочу','Идти']},
-  {c:'people',e:'🫵',l:'Ты',s:'ты',next:['Идти','Играть']},
-  {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',next:['Дом']},
-  {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',next:['Кушать','Гулять']},
+  // Люди (с вопросами, без Папы)
+  {c:'people',e:'👩',l:'Мама',s:'мама',next:['Привет', 'Как дела?', 'Где ты?', 'Когда будешь?', 'Люблю']},
+  {c:'people',e:'👩‍🦰',l:'Оля',s:'Оля',next:['Привет', 'Как дела?', 'Где ты?', 'Когда будешь?', 'Люблю']},
+  {c:'people',e:'👵',l:'Бабушка',s:'бабушка',next:['Привет', 'Как дела?', 'Где ты?', 'Люблю']},
+  {c:'people',e:'🧑',l:'Иляха',s:'Иляха',next:['Привет', 'Как дела?', 'Где ты?', 'Идешь?', 'Давай']},
+  {c:'people',e:'👦',l:'Братик',s:'братик',next:['Привет', 'Играть', 'Где ты?']},
+  {c:'people',e:'👴',l:'Дедушка',s:'дедушка',next:['Привет', 'Как дела?']},
+  {c:'people',e:'👧',l:'Сестра',s:'сестра',next:['Привет', 'Играть']},
+  {c:'people',e:'🧑‍🤝‍🧑',l:'Друг',s:'друг',next:['Привет', 'Играть']},
+  {c:'people',e:'🧑‍⚕️',l:'Врач',s:'врач',next:['Помощь', 'Больно']},
+  {c:'people',e:'🧑',l:'Я',s:'я',next:['Хочу', 'Идти', 'Могу']},
+  {c:'people',e:'👨‍👩‍👧',l:'Семья',s:'семья',next:['Дом', 'Люблю']},
+  {c:'people',e:'🐶',l:'Собачка Рюма',s:'собачка Рюма',next:['Кушать', 'Гулять']},
 
+  // Еда
   {c:'food',e:'💧',l:'Вода',s:'воду',next:['Пить']},
   {c:'food',e:'🍎',l:'Яблоко',s:'яблоко',next:['Еда']},
   {c:'food',e:'🍞',l:'Хлеб',s:'хлеб',next:['Еда']},
   {c:'food',e:'🧃',l:'Сок',s:'сок',next:['Пить']},
   {c:'food',e:'🍲',l:'Суп',s:'суп',next:['Еда']},
-  {c:'food',e:'🥣',l:'Каша',s:'кашу',next:['Еда']},
   {c:'food',e:'🍵',l:'Чай',s:'чай',next:['Пить']},
-  {c:'food',e:'🍖',l:'Мясо',s:'мясо',next:['Еда']},
-  {c:'food',e:'🐟',l:'Рыба',s:'рыбу',next:['Еда']},
-  {c:'food',e:'🍌',l:'Банан',s:'банан',next:['Еда']},
-  {c:'food',e:'🍊',l:'Апельсин',s:'апельсин',next:['Еда']},
-  {c:'food',e:'🧀',l:'Сыр',s:'сыр',next:['Еда']},
-  {c:'food',e:'🥛',l:'Молоко',s:'молоко',next:['Пить']},
-  {c:'food',e:'☕',l:'Кофе',s:'кофе',next:['Пить']},
+  {c:'food',e:'🍕',l:'Пицца',s:'пиццу',next:['Еда']},
+  {c:'food',e:'🥪',l:'Бутерброд',s:'бутерброд',next:['Еда']},
   {c:'food',e:'🍣',l:'Суши',s:'суши',next:['Еда']},
   {c:'food',e:'🍟',l:'Чипсики',s:'чипсики',next:['Еда']},
   {c:'food',e:'🍺',l:'Пиво',s:'пиво',next:['Пить']},
   {c:'food',e:'🥖',l:'Квас',s:'квас',next:['Пить']},
   {c:'food',e:'🍬',l:'Конфета',s:'конфету',next:['Еда']},
+  {c:'food',e:'🍫',l:'Шоколад',s:'шоколад',next:['Еда']},
   {c:'food',e:'🥐',l:'Булки',s:'две булки',next:['Купить']},
+  {c:'food',e:'➕',l:'Ещё',s:'ещё',next:[]},
+  {c:'food',e:'🍽️',l:'Вкусно',s:'вкусно',next:[]},
 
+  // Эмоции
   {c:'emotions',e:'😊',l:'Радость',s:'мне радостно',next:['Обнять', 'Играть']},
-  {c:'emotions',e:'😢',l:'Грусть',s:'мне грустно',next:['Поговорить', 'Обнять']},
+  {c:'emotions',e:'😢',l:'Грусть',s:'мне грустно',next:['Поговорить', 'Обнять', 'Мама']},
   {c:'emotions',e:'😠',l:'Злость',s:'я злюсь',next:['Оставь меня', 'Отдыхать']},
-  {c:'emotions',e:'😨',l:'Страх',s:'мне страшно',next:['Обнять', 'Побудь со мной', 'Мама']},
+  {c:'emotions',e:'😨',l:'Страх',s:'мне страшно',next:['Обнять', 'Мама']},
   {c:'emotions',e:'🥱',l:'Устал',s:'я устал',next:['Спать', 'Оставь меня']},
-  {c:'emotions',e:'😌',l:'Спокойно',s:'мне спокойно',next:[]},
   {c:'emotions',e:'😄',l:'Весело',s:'мне весело',next:['Играть']},
-  {c:'emotions',e:'😞',l:'Обидно',s:'мне обидно',next:['Поговорить', 'Обнять']},
-  {c:'emotions',e:'🥱',l:'Скучно',s:'мне скучно',next:['Играть', 'Поговорить']},
-  {c:'emotions',e:'😃',l:'Хорошо',s:'мне хорошо',next:[]},
-  {c:'emotions',e:'😣',l:'Плохо',s:'мне плохо',next:['Помощь', 'Обнять']},
-  {c:'emotions',e:'😱',l:'Боюсь',s:'я боюсь',next:['Мама', 'Обнять']},
-  {c:'emotions',e:'😂',l:'Смешно',s:'мне смешно',next:[]},
+  {c:'emotions',e:'😣',l:'Плохо',s:'мне плохо',next:['Помощь', 'Врач']},
   {c:'emotions',e:'😭',l:'Плакать',s:'я плачу',next:['Помощь', 'Обнять']},
 
+  // Места
   {c:'places',e:'🏠',l:'Дом',s:'домой',next:['Идти']},
   {c:'places',e:'🏫',l:'Школа',s:'в школу',next:['Идти']},
-  {c:'places',e:'🛣️',l:'Улица',s:'на улицу',next:['Идти']},
-  {c:'places',e:'⏰',l:'Сейчас',s:'сейчас',next:['Идти','Еда']},
-  {c:'places',e:'⏳',l:'Потом',s:'потом',next:[]},
-  {c:'places',e:'🌅',l:'Утро',s:'утром',next:['Еда']},
-  {c:'places',e:'🌆',l:'Вечер',s:'вечером',next:['Спать']},
-  {c:'places',e:'🌃',l:'Ночь',s:'ночью',next:['Спать']},
+  {c:'places',e:'🛣️',l:'Улица',s:'на улицу',next:['Идти', 'Гулять']},
+  {c:'places',e:'🌳',l:'Парк',s:'в парк',next:['Идти', 'Гулять']},
+  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',next:['Купить', 'Идти']},
   {c:'places',e:'🍳',l:'Кухня',s:'на кухне',next:['Еда']},
   {c:'places',e:'🛏️',l:'Спальня',s:'в спальне',next:['Спать']},
-  {c:'places',e:'🌳',l:'Парк',s:'в парк',next:['Идти']},
-  {c:'places',e:'🛒',l:'Магазин',s:'в магазин',next:['Купить']},
-  {c:'places',e:'🏪',l:'Магазин',s:'в магазин',next:['Купить','Булки']},
   {c:'places',e:'🚽',l:'Туалет',s:'в туалет',next:['Идти']},
-  {c:'places',e:'💼',l:'Работа',s:'на работу',next:['Идти']},
+  {c:'places',e:'⏰',l:'Сейчас',s:'сейчас',next:[]},
+  {c:'places',e:'⏳',l:'Потом',s:'потом',next:[]},
   {c:'places',e:'📅',l:'Пятница',s:'пятница',next:[]},
-  
-  {c:'things',e:'🔑',l:'Ключи',s:'ключи',next:[]},
-  {c:'things',e:'💵',l:'Деньги',s:'деньги',next:[]},
-  {c:'things',e:'👕',l:'Одежда',s:'одежду',next:[]},
-  {c:'things',e:'👟',l:'Обувь',s:'обувь',next:[]},
-  {c:'things',e:'💊',l:'Лекарство',s:'лекарство',next:[]},
-  {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',next:[]},
-  {c:'things',e:'👓',l:'Очки',s:'очки',next:[]},
 
-  {c:'game',e:'🎮',l:'Игры',s:'хочу играть в игры',next:['PlayStation','GTA 6']},
-  {c:'game',e:'🕹️',l:'PlayStation',s:'в плейстейшен',next:['Джойстик']},
-  {c:'game',e:'🚗',l:'GTA 6',s:'хочу играть в гэ тэ а',next:['Джойстик']},
+  // Вещи
+  {c:'things',e:'🔑',l:'Ключи',s:'ключи',next:['Где?', 'Взять']},
+  {c:'things',e:'💵',l:'Деньги',s:'деньги',next:['Купить']},
+  {c:'things',e:'💊',l:'Лекарство',s:'лекарство',next:['Выпить', 'Помощь']},
+  {c:'things',e:'🔌',l:'Зарядка',s:'зарядку',next:['Телефон']},
+  {c:'things',e:'👓',l:'Очки',s:'очки',next:['Где?']},
+
+  // Игры
+  {c:'game',e:'🎮',l:'Игры',s:'хочу играть в игры',next:['PlayStation','GTA 6','Телефон']},
+  {c:'game',e:'🕹️',l:'PlayStation',s:'в плейстейшен',next:['Джойстик', 'Включить']},
+  {c:'game',e:'🚗',l:'GTA 6',s:'хочу играть в гэ тэ а',next:['Джойстик', 'Включить']},
   {c:'game',e:'🕹️',l:'Джойстик',s:'дай джойстик',next:[]},
   {c:'game',e:'🏆',l:'Выиграл',s:'я выиграл',next:[]},
   {c:'game',e:'💥',l:'Проиграл',s:'я проиграл помоги',next:['Помощь']},
 
-  {c:'questions',e:'❓',l:'Где?',s:'где',next:['Очки','Телефон','Ключи']},
-  {c:'questions',e:'🤔',l:'Что это?',s:'что это',next:[]},
+  // Вопросы
+  {c:'questions',e:'❓',l:'Где?',s:'где',next:['Мама', 'Оля', 'Телефон', 'Ключи', 'Очки']},
+  {c:'questions',e:'🤔',l:'Как дела?',s:'как дела',next:[]},
+  {c:'questions',e:'📍',l:'Где ты?',s:'где ты',next:[]},
+  {c:'questions',e:'⏰',l:'Когда будешь?',s:'когда будешь',next:[]},
   {c:'questions',e:'🕒',l:'Когда?',s:'когда',next:[]},
   {c:'questions',e:'🤷',l:'Почему?',s:'почему',next:[]},
-  {c:'questions',e:'🧑',l:'Кто?',s:'кто',next:[]},
+  {c:'questions',e:'🧑',l:'Кто?',s:'кто',next:['Мама', 'Оля', 'Братик']},
   {c:'questions',e:'💰',l:'Сколько стоит?',s:'сколько стоит',next:[]}
 ];
 
@@ -303,9 +377,12 @@ const catNames = { needs:'✋ Потребности', social:'👋 Общени
 const catVoiceNames = { needs:'Потребности', social:'Общение', actions:'Действия', people:'Люди', food:'Еда', emotions:'Эмоции', places:'Места', things:'Вещи', game:'Игры', questions:'Вопросы' };
 const catColors = { needs:'c-needs', social:'c-social', actions:'c-actions', people:'c-people', food:'c-food', emotions:'c-emotions', places:'c-places', things:'c-things', game:'c-game', questions:'c-questions' };
 
+// --- 2. ГОТОВЫЕ ФРАЗЫ ---
 let templates = JSON.parse(localStorage.getItem('aac_templates'));
 if (!templates) {
   templates = [
+    { text: "Мама, привет, как дела, где ты, когда будешь?", say: "Мама, привет, как дела, где ты, когда будешь?", icon: "📱" },
+    { text: "Оля, привет, как дела, где ты, когда будешь?", say: "Оля, привет, как дела, где ты, когда будешь?", icon: "📱" },
     { text: "Я хочу купить 2 булки", say: "я хочу купить две булки", icon: "🥐" },
     { text: "Сколько это стоит?", say: "сколько это стоит", icon: "💰" },
     { text: "Где это находится?", say: "где это находится", icon: "🗺️" },
@@ -330,18 +407,21 @@ if (!templates) {
     { text: "Мне нужно в туалет", say: "мне нужно в туалет", icon: "🚽" },
     { text: "Мне больно, помогите", say: "мне больно помогите", icon: "🤕" },
     { text: "Позовите маму", say: "позовите маму", icon: "👩" },
-    { text: "Позовите папу", say: "позовите папу", icon: "👨" },
+    { text: "Позовите Олю", say: "позовите Олю", icon: "👩‍🦰" },
     { text: "Позовите Иляху", say: "позовите Иляху", icon: "🧑" },
     { text: "Хочу поговорить", say: "хочу поговорить", icon: "🗣️" },
     { text: "Обними меня", say: "обними меня", icon: "🤗" },
     { text: "Оставь меня одного", say: "оставь меня одного", icon: "🚪" },
     { text: "Пойдем гулять", say: "пойдем гулять", icon: "🌳" },
     { text: "Хочу домой", say: "хочу домой", icon: "🏠" },
-    { text: "Включи телевизор", say: "включи телевизор", icon: "📺" }
+    { text: "Включи телевизор", say: "включи телевизор", icon: "📺" },
+    { text: "Мне плохо", say: "мне плохо", icon: "🤒" },
+    { text: "Вызовите врача", say: "вызовите врача", icon: "🚑" }
   ];
 }
 function saveTemplates() { localStorage.setItem('aac_templates', JSON.stringify(templates)); }
 
+// --- 3. ОЗВУЧКА ---
 let voices = [];
 let selectedVoice = null;
 
@@ -383,6 +463,7 @@ function speak(text) {
   }
 }
 
+// --- 4. ЛОГИКА ОТРИСОВКИ ---
 let phrase = [];
 let activeCat = 'needs';
 let isLarge = false;
@@ -409,7 +490,13 @@ function render() {
     const card = document.createElement('div');
     card.className = `card ${catColors[it.c]} anim-pop`;
     card.style.animationDelay = `${index * 0.02}s`;
-    card.innerHTML = `<div class="emoji">${it.e}</div><span>${it.l}</span>`;
+    
+    if (it.e.startsWith('data:image')) {
+      card.innerHTML = `<img src="${it.e}" alt="${it.l}"><span>${it.l}</span>`;
+    } else {
+      card.innerHTML = `<div class="emoji">${it.e}</div><span>${it.l}</span>`;
+    }
+    
     card.onclick = () => addItem(it.l);
     gridEl.appendChild(card);
   });
@@ -427,6 +514,12 @@ function addItem(label) {
   const item = items.find(i => i.l === label);
   if (!item) return;
   
+  const now = Date.now();
+  if (window.lastCardClick && now - window.lastCardClick < 400) {
+    return; 
+  }
+  window.lastCardClick = now;
+
   let stats = JSON.parse(localStorage.getItem('aac_stats')) || {};
   stats[item.l] = (stats[item.l] || 0) + 1;
   localStorage.setItem('aac_stats', JSON.stringify(stats));
@@ -463,7 +556,13 @@ function renderSuggestions(words) {
     const div = document.createElement('div');
     div.className = 'suggest-card anim-pop';
     div.style.animationDelay = `${idx * 0.05}s`;
-    div.innerHTML = `${it.e} <span>${it.l}</span>`;
+    
+    if (it.e.startsWith('data:image')) {
+      div.innerHTML = `<img src="${it.e}"> <span>${it.l}</span>`;
+    } else {
+      div.innerHTML = `${it.e} <span>${it.l}</span>`;
+    }
+    
     div.onclick = () => addItem(it.l);
     container.appendChild(div);
   });
@@ -475,7 +574,7 @@ function updateStrip() {
     strip.innerHTML = '<span style="color:var(--text-light); font-weight:500; font-size:13px;">Нажимайте на карточки...</span>';
   } else {
     strip.innerHTML = phrase.map((p, idx) => 
-      `<div class="chip anim-pop" onclick="removeItem(${idx})">${p.e} ${p.l} ✕</div>`
+      `<div class="chip anim-pop" onclick="removeItem(${idx})">${p.e.startsWith('data:image') ? '📸' : p.e} ${p.l} ✕</div>`
     ).join('');
   }
   strip.scrollLeft = strip.scrollWidth;
@@ -498,7 +597,7 @@ document.addEventListener('click', (e) => {
   if (menu && !menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
 });
 
-// --- 6. ГОТОВЫЕ ФРАЗЫ (ЛОГИКА) ---
+// --- 6. ГОТОВЫЕ ФРАЗЫ ---
 function renderPhrases() {
   const list = document.getElementById('phrasesList');
   list.innerHTML = templates.map((p, idx) => `
@@ -546,7 +645,8 @@ document.getElementById('phrasesBtn').onclick = () => {
 };
 
 // --- 7. БЫСТРЫЙ ДОСТУП ---
-const quickWords = ['Вода', 'Туалет', 'Мама', 'Помощь', 'Иляха'];
+let quickWords = JSON.parse(localStorage.getItem('aac_quick_words')) || ['Вода', 'Туалет', 'Мама', 'Помощь', 'Иляха'];
+
 function renderQuickAccess() {
   const container = document.getElementById('quickAccess');
   container.innerHTML = '';
@@ -555,10 +655,47 @@ function renderQuickAccess() {
     if (!it) return;
     const div = document.createElement('div');
     div.className = 'suggest-card';
-    div.style.background = 'var(--surface)'; 
-    div.innerHTML = `<span style="font-size:20px;">${it.e}</span> <span style="font-weight:700; color:var(--text)">${it.l}</span>`;
+    div.style.borderColor = 'var(--text)';
+    
+    if (it.e.startsWith('data:image')) {
+      div.innerHTML = `<img src="${it.e}"> <span style="color:var(--text)">${it.l}</span>`;
+    } else {
+      div.innerHTML = `${it.e} <span style="color:var(--text)">${it.l}</span>`;
+    }
+    
     div.onclick = () => addItem(it.l);
     container.appendChild(div);
+  });
+}
+
+function openQuickAccessSettings() {
+  document.getElementById('quickSettingsModal').classList.add('active');
+  const list = document.getElementById('quickSettingsList');
+  list.innerHTML = '';
+  
+  items.forEach(it => {
+    const isSelected = quickWords.includes(it.l);
+    const btn = document.createElement('button');
+    btn.style = `padding:8px 12px; border-radius:8px; border:2px solid ${isSelected ? '#8b5cf6' : 'var(--border)'}; background:${isSelected ? '#8b5cf6' : 'var(--surface)'}; color:${isSelected ? '#fff' : 'var(--text)'}; font-weight:bold; cursor:pointer;`;
+    
+    if (it.e.startsWith('data:image')) {
+      btn.innerHTML = `<img src="${it.e}" style="width:20px; height:20px; border-radius:4px; object-fit:cover; vertical-align:middle; margin-right:5px;"> ${it.l}`;
+    } else {
+      btn.innerHTML = `${it.e} ${it.l}`;
+    }
+    
+    btn.onclick = () => {
+      if (quickWords.includes(it.l)) {
+        quickWords = quickWords.filter(w => w !== it.l);
+      } else {
+        if (quickWords.length >= 8) { alert("Максимум 8 слов!"); return; }
+        quickWords.push(it.l);
+      }
+      localStorage.setItem('aac_quick_words', JSON.stringify(quickWords));
+      openQuickAccessSettings();
+      renderQuickAccess();
+    };
+    list.appendChild(btn);
   });
 }
 
@@ -669,12 +806,16 @@ function updateFirstThenDisplay() {
   if (fVal) {
     document.getElementById('firstDisplay').innerText = fVal.split('|')[0];
     speak("Сначала: " + fVal.split('|')[2]);
-  } else document.getElementById('firstDisplay').innerText = '❓';
+  } else {
+    document.getElementById('firstDisplay').innerText = '❓';
+  }
   
   if (tVal) {
     document.getElementById('thenDisplay').innerText = tVal.split('|')[0];
     speak("Потом: " + tVal.split('|')[2]);
-  } else document.getElementById('thenDisplay').innerText = '❓';
+  } else {
+    document.getElementById('thenDisplay').innerText = '❓';
+  }
 }
 
 function speakFirstThen() {
@@ -691,17 +832,21 @@ function speakFirstThen() {
   speak(`Сначала ${firstSay}, потом ${thenSay}`);
 }
 
-// --- 11. ЧТЕНИЕ ТЕКСТА ---
+// --- 11. УМНЫЕ ОТВЕТЫ И ЧТЕНИЕ ТЕКСТА ---
 document.getElementById('readClipboardBtn').onclick = () => {
   document.getElementById('moreMenu').style.display = 'none';
   document.getElementById('clipboardText').value = '';
+  document.getElementById('quickRepliesBlock').style.display = 'none';
   document.getElementById('readClipboardModal').classList.add('active');
+  
+  speak("Режим чтения. Нажмите кнопку вставить из буфера или вставьте текст вручную.");
   
   if (navigator.clipboard && navigator.clipboard.readText) {
     navigator.clipboard.readText().then(text => {
       if (text && text.trim() !== '') {
         document.getElementById('clipboardText').value = text;
         speak(text);
+        analyzeText(text);
       }
     }).catch(err => console.log('Нет доступа:', err));
   }
@@ -712,20 +857,64 @@ document.getElementById('pasteAutoBtn').onclick = async () => {
     const text = await navigator.clipboard.readText();
     if (text && text.trim() !== '') {
       document.getElementById('clipboardText').value = text;
-      speak("Текст вставлен. Нажмите Прочитать.");
+      speak("Текст вставлен. Читаю. " + text);
+      analyzeText(text);
     } else {
-      speak("Буфер обмена пуст");
+      speak("Буфер обмена пуст. Скопируйте сообщение в Ватсап или Вайбер.");
     }
   } catch (err) {
-    speak("Не удалось прочитать буфер. Вставьте вручную.");
+    speak("Не удалось прочитать буфер. Вставьте текст вручную.");
   }
 };
 
 document.getElementById('readAgainBtn').onclick = () => {
   const text = document.getElementById('clipboardText').value;
-  if (text && text.trim() !== '') speak(text);
-  else speak("Нет текста для чтения");
+  if (text && text.trim() !== '') {
+    speak(text);
+    analyzeText(text);
+  } else {
+    speak("Нет текста для чтения. Скопируйте сообщение и нажмите вставить.");
+  }
 };
+
+function analyzeText(text) {
+  const lowerText = text.toLowerCase();
+  let replies = [];
+
+  if (lowerText.includes('?')) replies.push('Да', 'Нет', 'Не знаю');
+  if (lowerText.includes('ест') || lowerText.includes('куш') || lowerText.includes('обед') || lowerText.includes('ужин')) replies.push('Да, хочу', 'Нет, спасибо', 'Я голоден');
+  if (lowerText.includes('пить') || lowerText.includes('вод') || lowerText.includes('чай') || lowerText.includes('кофе')) replies.push('Да, хочу пить', 'Нет', 'Спасибо');
+  if (lowerText.includes('как дела') || lowerText.includes('как ты')) replies.push('Хорошо', 'Плохо', 'Нормально');
+  if (lowerText.includes('гулять') || lowerText.includes('идти') || lowerText.includes('пойдешь')) replies.push('Да, пойдем', 'Нет', 'Позже');
+
+  if (replies.length === 0) replies = ['Да', 'Нет', 'Спасибо'];
+  replies = [...new Set(replies)];
+
+  const block = document.getElementById('quickRepliesBlock');
+  const container = document.getElementById('quickRepliesContainer');
+  
+  block.style.display = 'block';
+  speak("Выберите ответ: " + replies.join(', '));
+  
+  container.innerHTML = replies.map(reply => `
+    <button onclick="sendQuickReply('${reply}')" style="padding: 10px 14px; border-radius: 8px; border: 1px solid var(--primary); background: var(--primary-light); color: var(--primary); font-weight: bold; font-size: 14px; cursor: pointer;">
+      ${reply}
+    </button>
+  `).join('');
+}
+
+function sendQuickReply(replyText) {
+  navigator.clipboard.writeText(replyText);
+  
+  const notification = document.createElement('div');
+  notification.style = "position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #059669; color: white; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
+  notification.innerText = "Ответ скопирован! Вставьте в Viber.";
+  document.body.appendChild(notification);
+  
+  setTimeout(() => notification.remove(), 3000);
+  speak(replyText + ". Скопировано.");
+  document.getElementById('readClipboardModal').classList.remove('active');
+}
 
 // --- 12. ОБО МНЕ ---
 let aboutMeData = JSON.parse(localStorage.getItem('aac_about_me')) || null;
@@ -743,8 +932,7 @@ function saveAboutMe() {
   alert("Данные сохранены на этом телефоне!");
 }
 
-document.getElementById('aboutMeBtn').onclick = () => {
-  document.getElementById('moreMenu').style.display = 'none';
+document.getElementById('aboutMeBtnHeader').onclick = () => {
   if (!aboutMeData || !aboutMeData.name) {
     alert("Сначала настройте данные в Настройках (⚙️)!");
     return;
@@ -970,7 +1158,7 @@ function startQuiz() {
   document.getElementById('quizTarget').innerText = quizTargetItem.l;
   document.getElementById('quizStatus').innerText = '';
   document.getElementById('quizOptions').innerHTML = options.map(opt => `
-    <div class="quiz-option" onclick="checkQuizAnswer('${opt.l}', this)">${opt.e}</div>
+    <div class="quiz-option" onclick="checkQuizAnswer('${opt.l}', this)">${opt.e.startsWith('data:image') ? `<img src="${opt.e}" style="width:100%; border-radius:10px;">` : opt.e}</div>
   `).join('');
   speak(`Найди ${quizTargetItem.l}`);
 }
@@ -991,19 +1179,42 @@ document.getElementById('quizBtn').onclick = () => {
   document.getElementById('quizModal').classList.add('active');
 };
 
-// --- 16. СОХРАНЕНИЕ СВОИХ СЛОВ ---
+// --- 16. СОХРАНЕНИЕ СВОИХ СЛОВ (С ФОТО) ---
+let uploadedPhotoBase64 = null;
+
+function previewPhoto(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedPhotoBase64 = e.target.result;
+      document.getElementById('previewImg').src = uploadedPhotoBase64;
+      document.getElementById('photoPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 function saveNewWord() {
   const title = document.getElementById('newWordTitle').value.trim();
   const emoji = document.getElementById('newWordEmoji').value.trim() || '📌';
   const category = document.getElementById('newWordCategory').value;
+  
   if (!title) { alert("Введите название слова!"); return; }
-  const newWord = { c: category, e: emoji, l: title, s: title.toLowerCase(), next: [] };
+  
+  const wordIcon = uploadedPhotoBase64 ? uploadedPhotoBase64 : emoji;
+  const newWord = { c: category, e: wordIcon, l: title, s: title.toLowerCase(), next: [] };
+  
   customWords.push(newWord);
   localStorage.setItem('aac_custom_words', JSON.stringify(customWords));
   items.push(newWord);
+  
   document.getElementById('addWordModal').classList.remove('active');
   document.getElementById('newWordTitle').value = '';
   document.getElementById('newWordEmoji').value = '';
+  document.getElementById('photoPreview').style.display = 'none';
+  uploadedPhotoBase64 = null;
+  
   speak("Слово добавлено: " + title);
   setCat(category);
 }
@@ -1033,7 +1244,7 @@ document.getElementById('micBtn').onclick = () => {
 // --- 18. КНОПКА ПОДЕЛИТЬСЯ ---
 document.getElementById('shareBtn').onclick = async () => {
   if (phrase.length === 0) { speak("Сначала выберите слова"); return; }
-  const textToShare = phrase.map(p => `${p.e} ${p.s}`).join(' ');
+  const textToShare = phrase.map(p => `${p.e.startsWith('data:image') ? '📸' : p.e} ${p.s}`).join(' ');
   if (navigator.share) {
     try { await navigator.share({ title: 'Сообщение', text: textToShare }); } catch (err) { console.log('Отмена', err); }
   } else {
@@ -1058,7 +1269,81 @@ document.getElementById('sizeBtn').onclick = (e) => {
   document.getElementById('grid').classList.toggle('big', isLarge);
 };
 
-// --- 20. БЕЗОПАСНОЕ АВТООБНОВЛЕНИЕ ---
+// --- 20. ПОГОДА И ОДЕЖДА ---
+document.getElementById('weatherBtn').onclick = () => {
+  document.getElementById('moreMenu').style.display = 'none';
+  const modal = document.getElementById('weatherModal');
+  const content = document.getElementById('weatherContent');
+  content.innerHTML = '<p>Загрузка погоды...</p>';
+  modal.classList.add('active');
+
+  let lat = 59.437;
+  let lon = 24.7536;
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
+        fetchWeather(lat, lon);
+      },
+      (err) => { fetchWeather(lat, lon); }
+    );
+  } else {
+    fetchWeather(lat, lon);
+  }
+};
+
+async function fetchWeather(lat, lon) {
+  const content = document.getElementById('weatherContent');
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+    const data = await res.json();
+    const temp = Math.round(data.current_weather.temperature);
+    const weatherCode = data.current_weather.weathercode;
+    
+    let clothes = [];
+    let speakText = "";
+    
+    const isRaining = (weatherCode >= 51 && weatherCode <= 67);
+    const isSnowing = (weatherCode >= 71 && weatherCode <= 77);
+
+    if (isSnowing) {
+      clothes = ['🧥 Пуховик', '🧣 Шарф', '🧤 Перчатки', '🧢 Шапка', '🥾 Зимние ботинки'];
+      speakText = `На улице идет снег и ${temp} градусов. Надень пуховик, шапку, шарф, перчатки и зимние ботинки.`;
+    } else if (isRaining) {
+      clothes = ['☔ Зонтик', '🧥 Дождевик', '🥾 Резиновые сапоги'];
+      speakText = `На улице идет дождь, ${temp} градусов. Возьми зонтик, дождевик и резиновые сапоги.`;
+    } else if (temp < 0) {
+      clothes = ['🧥 Пуховик', '🧣 Шарф', '🧤 Перчатки', '🧢 Шапка', '👖 Теплые штаны', '🥾 Зимняя обувь'];
+      speakText = `На улице очень холодно, ${temp} градусов. Надень пуховик, шапку, шарф, перчатки и зимнюю обувь.`;
+    } else if (temp >= 0 && temp < 15) {
+      clothes = ['🧥 Куртка', '👕 Кофта', '👖 Джинсы', '👟 Кроссовки'];
+      speakText = `На улице прохладно, ${temp} градусов. Надень куртку, кофту, джинсы и кроссовки.`;
+    } else if (temp >= 15 && temp < 25) {
+      clothes = ['👕 Футболка', '👖 Легкие штаны', '👟 Кроссовки', '🧢 Кепка'];
+      speakText = `На улице тепло, ${temp} градусов. Можно надеть футболку, штаны и кепку.`;
+    } else {
+      clothes = ['👕 Футболка', '🩳 Шорты', '🩴 Сандалии', '🧢 Кепка', '🕶️ Солнечные очки'];
+      speakText = `На улице жарко, ${temp} градусов. Надень шорты, футболку, сандалии и возьми очки.`;
+    }
+
+    content.innerHTML = `
+      <div style="text-align:center; width: 100%;">
+        <h1 style="font-size:50px; margin-bottom:10px; color:var(--primary);">${temp}°C</h1>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:15px;">
+          ${clothes.map(c => `<div style="background:var(--bg); padding:8px 12px; border-radius:10px; font-size:16px; font-weight:bold; border: 2px solid var(--border);">${c}</div>`).join('')}
+        </div>
+      </div>
+    `;
+    speak(speakText);
+  } catch (e) {
+    content.innerHTML = '<p style="text-align:center; color:#dc2626; font-weight:bold;">Ошибка загрузки погоды.<br>Проверьте интернет.</p>';
+    speak("Не удалось узнать погоду. Проверьте интернет.");
+  }
+}
+
+// --- 21. АВТООБНОВЛЕНИЕ ---
 async function checkForUpdates() {
   if (sessionStorage.getItem('update_checked')) return;
   try {
@@ -1073,7 +1358,7 @@ async function checkForUpdates() {
     } else {
       sessionStorage.setItem('update_checked', 'true');
     }
-  } catch (e) { console.log("Ошибка обновления"); }
+  } catch (e) { console.log("Ошибка проверки обновлений"); }
 }
 checkForUpdates();
 
@@ -1087,7 +1372,7 @@ async function clearCacheAndReload() {
   window.location.reload(true);
 }
 
-// --- 21. ЗАПУСК ---
+// --- 22. ЗАПУСК ---
 if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
   setTimeout(loadVoices, 300);
