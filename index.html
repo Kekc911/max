@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>?? Royal Vegas � �������� �����-����</title>
+<title>🎰 Royal Vegas — Бонусная Супер-Игра</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Playfair+Display:wght@700;900&display=swap');
 
@@ -226,7 +226,7 @@ h1 .icon {
   position: relative; z-index: 1; transition: color 0.3s;
 }
 
-/* ============ �����-������ ============ */
+/* ============ БОНУС-ПАНЕЛЬ ============ */
 .bonus-panel {
   background: linear-gradient(180deg, #1a0a2e 0%, #0d0518 100%);
   border-radius: 16px; padding: 12px 18px;
@@ -265,26 +265,17 @@ h1 .icon {
   100% { transform: scale(1); }
 }
 
-.bonus-info {
-  display: flex; flex-direction: column; gap: 2px;
-  position: relative; z-index: 1;
-}
+.bonus-info { display: flex; flex-direction: column; gap: 2px; position: relative; z-index: 1; }
 .bonus-title {
   font-family: 'Cinzel', serif;
   font-size: 0.85rem; font-weight: 800;
-  letter-spacing: 2px;
-  color: var(--bonus-light);
+  letter-spacing: 2px; color: var(--bonus-light);
   text-shadow: 0 0 10px var(--bonus), 0 1px 2px black;
   display: flex; align-items: center; gap: 6px;
 }
-.bonus-subtitle {
-  font-size: 0.7rem; color: #b8a0d8; letter-spacing: 0.5px;
-}
+.bonus-subtitle { font-size: 0.7rem; color: #b8a0d8; letter-spacing: 0.5px; }
 
-.bonus-indicator {
-  display: flex; gap: 4px; position: relative; z-index: 1;
-  align-items: center;
-}
+.bonus-indicator { display: flex; gap: 4px; position: relative; z-index: 1; align-items: center; }
 .bonus-dot {
   width: 14px; height: 14px; border-radius: 50%;
   background: #2a1a3e; border: 1px solid #4a2a6e;
@@ -304,8 +295,7 @@ h1 .icon {
 .bonus-btn {
   background: linear-gradient(180deg, var(--bonus-light) 0%, var(--bonus) 50%, #5a0090 100%);
   border: none; border-bottom: 4px solid #3a0060;
-  color: #fff;
-  font-family: 'Playfair Display', serif;
+  color: #fff; font-family: 'Playfair Display', serif;
   font-size: 0.85rem; font-weight: 900;
   padding: 10px 16px; border-radius: 10px;
   text-transform: uppercase; letter-spacing: 1.5px;
@@ -316,20 +306,14 @@ h1 .icon {
 }
 .bonus-btn:hover:not(:disabled) { filter: brightness(1.15); }
 .bonus-btn:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 1px; box-shadow: 0 0 12px rgba(155,48,255,0.6); }
-.bonus-btn:disabled {
-  opacity: 0.4; cursor: not-allowed;
-  filter: grayscale(0.6); box-shadow: none;
-}
+.bonus-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); box-shadow: none; }
 .bonus-btn.ready { animation: bonusBtnGlow 1s ease-in-out infinite alternate; }
 @keyframes bonusBtnGlow {
   from { box-shadow: 0 0 12px rgba(155,48,255,0.6), 0 4px 0 #3a0060; }
   to   { box-shadow: 0 0 30px rgba(216,160,255,0.9), 0 0 60px rgba(155,48,255,0.6), 0 4px 0 #3a0060; }
 }
 
-.guess-controls {
-  display: grid; grid-template-columns: repeat(6,1fr); gap: 10px;
-  margin-bottom: 20px;
-}
+.guess-controls { display: grid; grid-template-columns: repeat(6,1fr); gap: 10px; margin-bottom: 20px; }
 .guess-btn {
   background: linear-gradient(180deg, #3a2c14 0%, #1a1206 60%, #0d0803 100%);
   border: none; border-top: 1px solid rgba(245,215,110,0.4);
@@ -339,9 +323,7 @@ h1 .icon {
   font-size: clamp(1.3rem,4vw,1.7rem); font-weight: 900;
   height: clamp(58px,12vw,74px); border-radius: 14px;
   cursor: pointer; transition: all 0.12s ease;
-  box-shadow:
-    0 0 0 1px var(--gold-deep), 0 4px 10px rgba(0,0,0,0.7),
-    inset 0 1px 0 rgba(255,242,178,0.2);
+  box-shadow: 0 0 0 1px var(--gold-deep), 0 4px 10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,242,178,0.2);
   text-shadow: 0 1px 0 black;
   display: flex; justify-content: center; align-items: center;
   user-select: none; position: relative; overflow: hidden;
@@ -364,10 +346,7 @@ h1 .icon {
   background: linear-gradient(180deg, #ffe9a0 0%, var(--gold) 40%, var(--gold-deep) 100%);
   color: #1a0e00; text-shadow: 0 1px 0 rgba(255,255,255,0.5);
   border-top-color: #fffbe0; border-bottom-color: #6b4a0a;
-  box-shadow:
-    0 0 0 2px var(--gold-light),
-    0 0 24px rgba(245,215,110,0.85),
-    0 4px 10px rgba(0,0,0,0.7);
+  box-shadow: 0 0 0 2px var(--gold-light), 0 0 24px rgba(245,215,110,0.85), 0 4px 10px rgba(0,0,0,0.7);
   transform: translateY(2px);
 }
 .guess-btn:disabled { opacity: 0.4; transform: none; pointer-events: none; filter: grayscale(0.5); }
@@ -418,15 +397,8 @@ h1 .icon {
   min-width: 160px;
 }
 .spin-btn:hover:not(:disabled) { filter: brightness(1.08); }
-.spin-btn:active:not(:disabled) {
-  transform: translateY(6px); border-bottom-width: 2px;
-  box-shadow: 0 2px 0 #4f3a12, 0 8px 14px black;
-}
-.spin-btn:disabled {
-  opacity: 0.5; transform: translateY(4px);
-  box-shadow: 0 4px 0 #4f3a12; border-bottom-width: 2px;
-  pointer-events: none;
-}
+.spin-btn:active:not(:disabled) { transform: translateY(6px); border-bottom-width: 2px; box-shadow: 0 2px 0 #4f3a12, 0 8px 14px black; }
+.spin-btn:disabled { opacity: 0.5; transform: translateY(4px); box-shadow: 0 4px 0 #4f3a12; border-bottom-width: 2px; pointer-events: none; }
 
 .info-bar {
   display: flex; justify-content: space-between; margin-top: 18px;
@@ -438,7 +410,7 @@ h1 .icon {
   box-shadow: inset 0 1px 4px black; border: 1px solid #3f4e58;
 }
 
-/* ==================== ��� (��������) ==================== */
+/* ==================== ЛЕЩ (проигрыш) ==================== */
 .slap-hand {
   position: fixed; top: 50%; left: -300px;
   width: 300px; height: 240px;
@@ -463,11 +435,7 @@ h1 .icon {
   z-index: 99998; pointer-events: none; opacity: 0;
 }
 .slap-flash.active { animation: slapFlashAnim 0.65s ease-out forwards; }
-@keyframes slapFlashAnim {
-  0%   { opacity: 0; }
-  10%  { opacity: 1; }
-  100% { opacity: 0; }
-}
+@keyframes slapFlashAnim { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
 
 .shake-screen { animation: shakeHard 0.55s ease-in-out; }
 @keyframes shakeHard {
@@ -489,9 +457,7 @@ h1 .icon {
   font-family: 'Playfair Display', serif;
   font-size: clamp(3rem, 14vw, 7rem); font-weight: 900;
   color: #fff;
-  text-shadow:
-    0 0 20px #ff2d2d, 0 0 40px #ff0000,
-    0 6px 0 #8b0000, 0 8px 20px black;
+  text-shadow: 0 0 20px #ff2d2d, 0 0 40px #ff0000, 0 6px 0 #8b0000, 0 8px 20px black;
   z-index: 100000; pointer-events: none; opacity: 0;
   letter-spacing: 6px; white-space: nowrap;
 }
@@ -504,11 +470,8 @@ h1 .icon {
   100% { opacity: 0; transform: translate(-50%,-50%) scale(0.8) rotate(0); }
 }
 
-/* ==================== ������� ==================== */
-.gold-burst {
-  position: fixed; inset: 0; pointer-events: none;
-  z-index: 99997; overflow: hidden;
-}
+/* ==================== ВЫИГРЫШ ==================== */
+.gold-burst { position: fixed; inset: 0; pointer-events: none; z-index: 99997; overflow: hidden; }
 .gold-particle {
   position: absolute; top: 50%; left: 50%;
   width: 14px; height: 14px; border-radius: 50%;
@@ -537,4 +500,459 @@ h1 .icon {
   font-size: clamp(2.2rem, 9vw, 5rem); font-weight: 900;
   text-align: center; z-index: 100000; pointer-events: none;
   opacity: 0; white-space: nowrap; letter-spacing: 4px;
-  background: linear-gradient(180deg, #fffbe0 0%, #ffe066 30%, #f5d76e 55%, #b
+  background: linear-gradient(180deg, #fffbe0 0%, #ffe066 30%, #f5d76e 55%, #b8860b 80%, #6b4a0a 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 20px #fff3a0) drop-shadow(0 0 40px #ffbf00) drop-shadow(0 6px 0 #4a3000) drop-shadow(0 10px 30px black);
+}
+.mega-win-text.active { animation: megaWinAnim 2s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes megaWinAnim {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0) rotate(-20deg); }
+  20%  { opacity: 1; transform: translate(-50%,-50%) scale(1.4) rotate(8deg); }
+  35%  { transform: translate(-50%,-50%) scale(1) rotate(-5deg); }
+  50%  { transform: translate(-50%,-50%) scale(1.2) rotate(3deg); }
+  65%  { transform: translate(-50%,-50%) scale(1) rotate(-2deg); }
+  80%  { transform: translate(-50%,-50%) scale(1.05) rotate(1deg); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.6) rotate(0); }
+}
+
+.win-flash {
+  position: fixed; inset: 0; z-index: 99994;
+  background: radial-gradient(circle at center, rgba(255,255,200,0.9) 0%, rgba(255,215,0,0.4) 30%, transparent 70%);
+  pointer-events: none; opacity: 0;
+}
+.win-flash.active { animation: winFlashAnim 1.2s ease-out forwards; }
+@keyframes winFlashAnim { 0% { opacity: 0; } 8% { opacity: 1; } 40% { opacity: 0.4; } 100% { opacity: 0; } }
+
+@media (max-width: 480px) {
+  .casino { padding: 20px 14px; }
+  h1 { letter-spacing: 2px; }
+  .bet-section { flex-direction: column; }
+  .spin-btn { width: 100%; }
+  .slap-hand { width: 200px; height: 160px; }
+}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="casino" id="casinoCard">
+  <h1><span class="icon">🎲</span> ROYAL VEGAS <span class="icon">🎰</span></h1>
+
+  <div class="balance-panel">
+    <div class="balance-label">💰 БАЛАНС</div>
+    <div class="balance-amount" id="balanceDisplay">1000</div>
+  </div>
+
+  <div class="game-area">
+    <div class="dice-display">
+      <div class="number-box" id="playerNumber">?</div>
+      <div class="vs-badge">VS</div>
+      <div class="number-box" id="casinoNumber">?</div>
+    </div>
+    <div class="result-message" id="resultMessage">Выберите число и сделайте ставку</div>
+  </div>
+
+  <div class="bonus-panel" id="bonusPanel">
+    <div class="bonus-info">
+      <div class="bonus-title">✨ БОНУСНАЯ ИГРА</div>
+      <div class="bonus-subtitle">Собери 3 искры — активируй джекпот</div>
+    </div>
+    <div class="bonus-indicator" id="bonusDots">
+      <div class="bonus-dot"></div>
+      <div class="bonus-dot"></div>
+      <div class="bonus-dot"></div>
+    </div>
+    <button class="bonus-btn" id="bonusBtn" disabled>СУПЕР-ИГРА</button>
+  </div>
+
+  <div class="guess-controls" id="guessButtons">
+    <button class="guess-btn" data-guess="1">1</button>
+    <button class="guess-btn" data-guess="2">2</button>
+    <button class="guess-btn" data-guess="3">3</button>
+    <button class="guess-btn" data-guess="4">4</button>
+    <button class="guess-btn" data-guess="5">5</button>
+    <button class="guess-btn" data-guess="6">6</button>
+  </div>
+
+  <div class="bet-section">
+    <div class="bet-control">
+      <label>СТАВКА</label>
+      <input type="number" id="betInput" class="bet-amount" value="100" min="10" max="10000" step="10">
+    </div>
+    <button class="spin-btn" id="spinBtn">🎲 КРУТИТЬ</button>
+  </div>
+
+  <div class="info-bar">
+    <span>🎯 Угадай 1–6 — выигрыш x2</span>
+    <span>💥 3 искры = ДЖЕКПОТ</span>
+  </div>
+</div>
+
+<script>
+
+(function(){
+  // ===== Состояние =====
+  let balance = 1000;
+  let selectedGuess = null;
+  let isSpinning = false;
+  let bonusDots = 0;
+  let bonusActive = false;
+
+  // ===== DOM =====
+  const balanceDisplay = document.getElementById('balanceDisplay');
+  const playerNumberEl = document.getElementById('playerNumber');
+  const casinoNumberEl = document.getElementById('casinoNumber');
+  const resultMessage  = document.getElementById('resultMessage');
+  const betInput       = document.getElementById('betInput');
+  const spinBtn        = document.getElementById('spinBtn');
+  const guessButtons   = document.querySelectorAll('.guess-btn');
+  const casinoCard     = document.getElementById('casinoCard');
+  const bonusPanel     = document.getElementById('bonusPanel');
+  const bonusDotsEl    = document.getElementById('bonusDots');
+  const bonusBtn       = document.getElementById('bonusBtn');
+
+  // ===== Утилиты =====
+  function updateBalanceUI(){ balanceDisplay.textContent = balance; }
+  function flashBalance(){
+    balanceDisplay.classList.remove('flash');
+    void balanceDisplay.offsetWidth;
+    balanceDisplay.classList.add('flash');
+  }
+  function setSelectedGuess(g){
+    selectedGuess = g;
+    guessButtons.forEach(b => b.classList.toggle('selected', parseInt(b.dataset.guess,10) === g));
+  }
+  function clearSelection(){
+    selectedGuess = null;
+    guessButtons.forEach(b => b.classList.remove('selected'));
+  }
+  function setControlsDisabled(d){
+    betInput.disabled = d;
+    spinBtn.disabled = d;
+    guessButtons.forEach(b => b.disabled = d);
+    bonusBtn.disabled = d || !bonusActive;
+    if (!d && bonusActive) bonusBtn.classList.add('ready');
+    else bonusBtn.classList.remove('ready');
+  }
+  function resetBoxStyles(){
+    playerNumberEl.classList.remove('win','lose');
+    casinoNumberEl.classList.remove('win','lose');
+  }
+
+  // ===== Бонус =====
+  function updateBonusUI(){
+    const dots = bonusDotsEl.querySelectorAll('.bonus-dot');
+    dots.forEach((d,i) => d.classList.toggle('filled', i < bonusDots));
+    if (bonusDots >= 3){
+      bonusActive = true;
+      bonusBtn.disabled = false;
+      bonusBtn.classList.add('ready');
+      bonusPanel.classList.add('active');
+      resultMessage.textContent = '✨ БОНУС АКТИВИРОВАН! Жми СУПЕР-ИГРА! ✨';
+      resultMessage.style.color = '#d8a0ff';
+    } else {
+      bonusActive = false;
+      bonusBtn.classList.remove('ready');
+      bonusBtn.disabled = true;
+      bonusPanel.classList.remove('active');
+    }
+  }
+  function addBonusDot(){
+    if (bonusDots < 3) bonusDots++;
+    updateBonusUI();
+  }
+  function resetBonus(){
+    bonusDots = 0;
+    bonusActive = false;
+    updateBonusUI();
+  }
+
+  // ===== Эффект ЛЕЩ =====
+  const slapHandSVG = `
+    <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd9b0"/>
+          <stop offset="1" stop-color="#e0a070"/>
+        </linearGradient>
+      </defs>
+      <path d="M20,80 Q10,40 40,25 Q70,10 100,25 Q120,35 130,60 L195,80 Q200,95 195,110 L130,130 Q120,155 100,165 Q70,180 40,165 Q10,150 20,80 Z"
+            fill="url(#skin)" stroke="#a06030" stroke-width="3"/>
+      <path d="M60,50 Q80,60 80,90 M90,45 Q110,60 110,95 M120,50 Q135,65 135,100"
+            stroke="#c08050" stroke-width="2" fill="none" opacity="0.6"/>
+    </svg>`;
+
+  function triggerSlap(){
+    const hand = document.createElement('div');
+    hand.className = 'slap-hand';
+    hand.innerHTML = slapHandSVG;
+    document.body.appendChild(hand);
+
+    const flash = document.createElement('div');
+    flash.className = 'slap-flash';
+    document.body.appendChild(flash);
+
+    const text = document.createElement('div');
+    text.className = 'slap-text';
+    text.textContent = 'ЛЕЩ!';
+    document.body.appendChild(text);
+
+    casinoCard.classList.add('shake-screen');
+
+    requestAnimationFrame(() => {
+      hand.classList.add('active');
+      flash.classList.add('active');
+      setTimeout(() => text.classList.add('active'), 400);
+    });
+
+    setTimeout(() => {
+      hand.remove(); flash.remove(); text.remove();
+      casinoCard.classList.remove('shake-screen');
+    }, 1500);
+  }
+
+  // ===== Мощный выигрыш =====
+  function triggerMegaWin(){
+    const flash = document.createElement('div');
+    flash.className = 'win-flash';
+    document.body.appendChild(flash);
+
+    const sun = document.createElement('div');
+    sun.className = 'gold-sun';
+    document.body.appendChild(sun);
+
+    const txt = document.createElement('div');
+    txt.className = 'mega-win-text';
+    txt.textContent = 'ПОБЕДА!';
+    document.body.appendChild(txt);
+
+    const burst = document.createElement('div');
+    burst.className = 'gold-burst';
+    document.body.appendChild(burst);
+
+    const N = 70;
+    for (let i = 0; i < N; i++){
+      const p = document.createElement('div');
+      p.className = 'gold-particle';
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 200 + Math.random() * 500;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      const rot = Math.random() * 720 - 360;
+      p.animate([
+        { transform: 'translate(-50%,-50%) scale(0.3)', opacity: 0 },
+        { transform: `translate(calc(-50% + ${tx*0.3}px), calc(-50% + ${ty*0.3}px)) scale(1.2)`, opacity: 1, offset: 0.2 },
+        { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rot}deg) scale(0.6)`, opacity: 0 }
+      ], { duration: 1600, easing: 'cubic-bezier(0.2,0.8,0.4,1)' });
+      burst.appendChild(p);
+    }
+
+    for (let i = 0; i < 20; i++){
+      const ray = document.createElement('div');
+      ray.className = 'firework-ray';
+      const hue = 40 + Math.random() * 30;
+      ray.style.background = `hsl(${hue}, 100%, 65%)`;
+      ray.style.color = `hsl(${hue}, 100%, 65%)`;
+      document.body.appendChild(ray);
+      const angle = (i / 20) * Math.PI * 2;
+      const dist = 250 + Math.random() * 250;
+      ray.animate([
+        { transform: 'translate(-50%,-50%) scale(0)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px)) scale(1)`, opacity: 0.9, offset: 0.6 },
+        { transform: `translate(calc(-50% + ${Math.cos(angle)*dist*1.2}px), calc(-50% + ${Math.sin(angle)*dist*1.2}px)) scale(0)`, opacity: 0 }
+      ], { duration: 1400, easing: 'cubic-bezier(0.1,0.7,0.3,1)' });
+      setTimeout(() => ray.remove(), 1500);
+    }
+
+    requestAnimationFrame(() => {
+      sun.classList.add('active');
+      flash.classList.add('active');
+      txt.classList.add('active');
+    });
+
+    casinoCard.classList.add('win-glow');
+
+    setTimeout(() => {
+      sun.remove(); flash.remove(); txt.remove(); burst.remove();
+      casinoCard.classList.remove('win-glow');
+    }, 2300);
+  }
+
+  // ===== Основной СПИН =====
+  function spin(){
+    if (isSpinning) return;
+    if (selectedGuess === null){
+      resultMessage.textContent = '❌ Сначала выберите число (1-6)!';
+      resultMessage.style.color = '#ffb3b3';
+      return;
+    }
+    if (balance < 10){
+      resultMessage.textContent = '💔 Недостаточно средств. Обновите страницу.';
+      resultMessage.style.color = '#ff8080';
+      return;
+    }
+
+    let bet = parseInt(betInput.value, 10);
+    if (isNaN(bet) || bet < 10) bet = 10;
+    if (bet > balance) bet = balance;
+    if (bet > 10000) bet = 10000;
+    betInput.value = bet;
+
+    isSpinning = true;
+    setControlsDisabled(true);
+    resetBoxStyles();
+
+    balance -= bet;
+    updateBalanceUI();
+
+    resultMessage.style.color = '#ead49b';
+    resultMessage.textContent = '🎲 Крутим...';
+
+    const playerRoll = selectedGuess;
+    const casinoRoll = Math.floor(Math.random() * 6) + 1;
+
+    let counter = 0;
+    const totalFrames = 12;
+    const interval = setInterval(() => {
+      playerNumberEl.textContent = Math.floor(Math.random() * 6) + 1;
+      casinoNumberEl.textContent = Math.floor(Math.random() * 6) + 1;
+      counter++;
+
+      if (counter >= totalFrames){
+        clearInterval(interval);
+        playerNumberEl.textContent = playerRoll;
+        casinoNumberEl.textContent = casinoRoll;
+
+        const win = (playerRoll === casinoRoll);
+        if (win){
+          const winAmount = bet * 2;
+          balance += winAmount;
+          updateBalanceUI();
+          flashBalance();
+          playerNumberEl.classList.add('win');
+          casinoNumberEl.classList.add('win');
+          resultMessage.textContent = `🎉 ПОБЕДА! ${playerRoll} = ${casinoRoll}. +${winAmount} 💰`;
+          resultMessage.style.color = '#b5ff9b';
+          triggerMegaWin();
+          addBonusDot();
+        } else {
+          playerNumberEl.classList.add('lose');
+          casinoNumberEl.classList.add('lose');
+          resultMessage.textContent = `😞 Проигрыш. Вы: ${playerRoll}, казино: ${casinoRoll}. -${bet}`;
+          resultMessage.style.color = '#ff9e9e';
+          triggerSlap();
+        }
+
+        isSpinning = false;
+        setControlsDisabled(false);
+
+        if (balance < 10){
+          spinBtn.disabled = true;
+          betInput.disabled = true;
+          guessButtons.forEach(b => b.disabled = true);
+          resultMessage.textContent += ' ⛔ Недостаточно средств.';
+        }
+      }
+    }, 80);
+  }
+
+  // ===== БОНУСНАЯ СУПЕР-ИГРА =====
+  function playBonusGame(){
+    if (!bonusActive || isSpinning) return;
+    isSpinning = true;
+    setControlsDisabled(true);
+
+    resultMessage.textContent = '🎰 СУПЕР-ИГРА! Крутим джекпот...';
+    resultMessage.style.color = '#d8a0ff';
+
+    // Анимация рулетки
+    let ticks = 0;
+    const totalTicks = 30;
+    const roulette = setInterval(() => {
+      playerNumberEl.textContent = Math.floor(Math.random() * 6) + 1;
+      casinoNumberEl.textContent = Math.floor(Math.random() * 6) + 1;
+      ticks++;
+      if (ticks >= totalTicks){
+        clearInterval(roulette);
+
+        // Шанс джекпота 1 к 6
+        const jackpotRoll = Math.floor(Math.random() * 6) + 1;
+        const playerJack = Math.floor(Math.random() * 6) + 1;
+        playerNumberEl.textContent = playerJack;
+        casinoNumberEl.textContent = jackpotRoll;
+
+        if (playerJack === jackpotRoll){
+          // ДЖЕКПОТ!
+          const jackpot = Math.max(1000, Math.floor(balance * 0.5));
+          balance += jackpot;
+          updateBalanceUI();
+          flashBalance();
+          playerNumberEl.classList.add('win');
+          casinoNumberEl.classList.add('win');
+          resultMessage.textContent = `💎 ДЖЕКПОТ! +${jackpot} 💰!!!`;
+          resultMessage.style.color = '#ffe066';
+          triggerMegaWin();
+          // Двойной мега-выигрыш
+          setTimeout(triggerMegaWin, 600);
+        } else {
+          // Утешительный приз
+          const consolation = 50;
+          balance += consolation;
+          updateBalanceUI();
+          flashBalance();
+          playerNumberEl.classList.add('win');
+          casinoNumberEl.classList.add('lose');
+          resultMessage.textContent = `✨ Утешительный приз: +${consolation} 💰`;
+          resultMessage.style.color = '#d8a0ff';
+          triggerMegaWin();
+        }
+
+        resetBonus();
+        isSpinning = false;
+        setControlsDisabled(false);
+
+        if (balance < 10){
+          spinBtn.disabled = true;
+          betInput.disabled = true;
+          guessButtons.forEach(b => b.disabled = true);
+        }
+      }
+    }, 70);
+  }
+
+  // ===== Обработчики =====
+  guessButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (isSpinning) return;
+      setSelectedGuess(parseInt(btn.dataset.guess, 10));
+      resultMessage.textContent = `Выбрано число: ${selectedGuess}. Жмите КРУТИТЬ.`;
+      resultMessage.style.color = '#ead49b';
+    });
+  });
+
+  spinBtn.addEventListener('click', spin);
+  bonusBtn.addEventListener('click', playBonusGame);
+
+  betInput.addEventListener('blur', () => {
+    if (isSpinning) return;
+    let v = parseInt(betInput.value, 10);
+    if (isNaN(v) || v < 10) v = 10;
+    if (v > balance) v = balance;
+    if (v > 10000) v = 10000;
+    betInput.value = v;
+  });
+  betInput.addEventListener('keydown', e => {
+    if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault();
+  });
+
+  // ===== Инициализация =====
+  resetBoxStyles();
+  clearSelection();
+  playerNumberEl.textContent = '?';
+  casinoNumberEl.textContent = '?';
+  updateBalanceUI();
+  updateBonusUI();
+})();
+</script>
+</body>
+</html>
